@@ -11,8 +11,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @EnableJpaAuditing
 public class SeoulpopApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(SeoulpopApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(SeoulpopApplication.class, args);
+    }
 
 }

@@ -1,13 +1,8 @@
 package com.ssafy.seoulpop.heritage.domain;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ssafy.seoulpop.common.BaseEntity;
 import com.ssafy.seoulpop.heritage.image.HeritageImage;
 import com.ssafy.seoulpop.history.domain.History;
-
 import jakarta.annotation.Nullable;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -17,6 +12,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,31 +29,32 @@ import lombok.Setter;
 @Builder
 @Entity
 public class Heritage extends BaseEntity {
-	@OneToOne
-	@JoinColumn(name = "history_id")
-	private History history;
 
-	@NonNull
-	private String type;
+    @OneToOne
+    @JoinColumn(name = "history_id")
+    private History history;
 
-	@NonNull
-	private String label;
+    @NonNull
+    private String type;
 
-	@NonNull
-	@Column(columnDefinition = "datetime(0) default now(0)", nullable = false)
-	private LocalDateTime registeredAt;
+    @NonNull
+    private String label;
 
-	@Nullable
-	private String era;
+    @NonNull
+    @Column(columnDefinition = "datetime(0) default now(0)", nullable = false)
+    private LocalDateTime registeredAt;
 
-	@NonNull
-	private String address;
+    @Nullable
+    private String era;
 
-	@NonNull
-	@Lob
-	private String description;
+    @NonNull
+    private String address;
 
-	@OneToMany(mappedBy = "heritage", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-	@Builder.Default
-	private List<HeritageImage> heritageImages = new ArrayList<>();
+    @NonNull
+    @Lob
+    private String description;
+
+    @OneToMany(mappedBy = "heritage", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<HeritageImage> heritageImages = new ArrayList<>();
 }

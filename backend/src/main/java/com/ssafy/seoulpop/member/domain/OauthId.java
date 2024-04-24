@@ -1,7 +1,6 @@
 package com.ssafy.seoulpop.member.domain;
 
 import com.ssafy.seoulpop.member.domain.type.OauthServerType;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
@@ -16,10 +15,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OauthId {
-	@Column(nullable = false, name = "oauth_server_id")
-	private String oauthServerId;
 
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, name = "oauth_server")
-	private OauthServerType oauthServerType;
+    @Column(nullable = false, name = "oauth_server_id")
+    private String oauthServerId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, name = "oauth_server")
+    private OauthServerType oauthServerType;
 }

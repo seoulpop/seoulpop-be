@@ -1,12 +1,8 @@
 package com.ssafy.seoulpop.site.domain;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ssafy.seoulpop.common.BaseEntity;
 import com.ssafy.seoulpop.history.domain.History;
 import com.ssafy.seoulpop.site.image.SiteImage;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -14,6 +10,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,33 +26,34 @@ import lombok.Setter;
 @Builder
 @Entity
 public class Site extends BaseEntity {
-	@OneToOne
-	@JoinColumn(name = "history_id")
-	private History history;
 
-	@NonNull
-	private String label;
+    @OneToOne
+    @JoinColumn(name = "history_id")
+    private History history;
 
-	@NonNull
-	private String status;
+    @NonNull
+    private String label;
 
-	@NonNull
-	private String summary;
+    @NonNull
+    private String status;
 
-	@NonNull
-	@Lob
-	private String description;
+    @NonNull
+    private String summary;
 
-	@NonNull
-	private String historicAddress;
+    @NonNull
+    @Lob
+    private String description;
 
-	@NonNull
-	private String address;
+    @NonNull
+    private String historicAddress;
 
-	@NonNull
-	private String reference;
+    @NonNull
+    private String address;
 
-	@OneToMany(mappedBy = "site", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-	@Builder.Default
-	private List<SiteImage> siteImages = new ArrayList<>();
+    @NonNull
+    private String reference;
+
+    @OneToMany(mappedBy = "site", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<SiteImage> siteImages = new ArrayList<>();
 }

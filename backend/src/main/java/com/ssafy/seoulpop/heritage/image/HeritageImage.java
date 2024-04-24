@@ -2,7 +2,6 @@ package com.ssafy.seoulpop.heritage.image;
 
 import com.ssafy.seoulpop.common.BaseEntity;
 import com.ssafy.seoulpop.heritage.domain.Heritage;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -22,14 +21,15 @@ import lombok.Setter;
 @Builder
 @Entity
 public class HeritageImage extends BaseEntity {
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "heritage_id")
-	private Heritage heritage;
 
-	@NonNull
-	@Lob
-	private String imageUrl;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "heritage_id")
+    private Heritage heritage;
 
-	@NonNull
-	private String caption;
+    @NonNull
+    @Lob
+    private String imageUrl;
+
+    @NonNull
+    private String caption;
 }

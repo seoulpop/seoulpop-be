@@ -1,7 +1,6 @@
 package com.ssafy.seoulpop.history.domain;
 
 import com.ssafy.seoulpop.common.BaseEntity;
-
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,15 +16,16 @@ import lombok.Setter;
 @Builder
 @Entity
 public class History extends BaseEntity {
-	@NonNull
-	private Double lat;
 
-	@NonNull
-	private Double lng;
+    @NonNull
+    private Double lat;
 
-	@NonNull
-	private String name;
+    @NonNull
+    private Double lng;
 
-	@NonNull
-	private String category;
+    @NonNull
+    private String name;
+
+    @NonNull
+    private String category;
 }

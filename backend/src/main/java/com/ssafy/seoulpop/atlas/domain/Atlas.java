@@ -3,7 +3,6 @@ package com.ssafy.seoulpop.atlas.domain;
 import com.ssafy.seoulpop.common.BaseEntity;
 import com.ssafy.seoulpop.history.domain.History;
 import com.ssafy.seoulpop.member.domain.Member;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -21,11 +20,12 @@ import lombok.Setter;
 @Builder
 @Entity
 public class Atlas extends BaseEntity {
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "member_id")
-	private Member member;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "history_id")
-	private History history;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "history_id")
+    private History history;
 }
