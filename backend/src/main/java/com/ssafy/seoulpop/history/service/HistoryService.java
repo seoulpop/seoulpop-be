@@ -19,6 +19,6 @@ public class HistoryService {
     }
 
     public List<HistoryMapResponseDto> readHistoryList(String category) {
-        return historyRepository.findByCategory(category).stream().map(HistoryMapResponseDto::from).toList();
+        return historyRepository.findAllByCategory(category).stream().map(HistoryMapResponseDto::from).toList();
     }
 }
