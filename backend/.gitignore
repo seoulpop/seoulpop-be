@@ -5,6 +5,11 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+### CheckStyle Jar###
+config/checkstyle/*.jar
+### Query Dsl###
+src/main/generated
+
 ### STS ###
 .apt_generated
 .classpath
