@@ -1,6 +1,7 @@
 package com.ssafy.seoulpop.history.domain;
 
 import com.ssafy.seoulpop.common.BaseEntity;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,4 +29,7 @@ public class History extends BaseEntity {
 
     @NonNull
     private String category;
+
+    @Embedded
+    private Cell cell;
 }

@@ -4,10 +4,10 @@ import com.ssafy.seoulpop.common.BaseEntity;
 import com.ssafy.seoulpop.history.domain.History;
 import com.ssafy.seoulpop.site.image.SiteImage;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import java.util.ArrayList;
@@ -34,14 +34,13 @@ public class Site extends BaseEntity {
     @NonNull
     private String label;
 
-    @NonNull
     private String status;
 
     @NonNull
     private String summary;
 
     @NonNull
-    @Lob
+    @Column(columnDefinition = "MEDIUMTEXT")
     private String description;
 
     @NonNull
