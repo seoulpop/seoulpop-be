@@ -9,7 +9,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
@@ -51,7 +50,7 @@ public class Heritage extends BaseEntity {
     private String address;
 
     @NonNull
-    @Lob
+    @Column(columnDefinition = "MEDIUMTEXT")
     private String description;
 
     @OneToMany(mappedBy = "heritage", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
