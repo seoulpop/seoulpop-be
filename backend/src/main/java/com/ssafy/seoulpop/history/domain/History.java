@@ -59,7 +59,7 @@ public class History extends BaseEntity {
 
     private String reference; // SiteDto
 
-    @Column(columnDefinition = "datetime(0) default now(0)", nullable = false)
+    @Column(columnDefinition = "datetime(0) default now(0)")
     private LocalDateTime registeredAt; // HeritageDto
 
     private String era; // HeritageDto
