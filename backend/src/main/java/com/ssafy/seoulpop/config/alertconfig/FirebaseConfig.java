@@ -10,14 +10,14 @@ import jakarta.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@RequiredArgsConstructor
 public class FirebaseConfig {
 
-    @Autowired
-    private ServiceAccountKey serviceAccountKey;
+    private final ServiceAccountKey serviceAccountKey;
 
     @PostConstruct
     public void initFirebase() throws IOException {
