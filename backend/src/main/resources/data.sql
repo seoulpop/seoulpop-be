@@ -1,12 +1,12 @@
 --역사
 insert into History (id, lat, lng, name, category, cell_7_index, cell_8_index, cell_9_index, cell_10_index, cell_11_index, cell_12_index, createdAt, updatedAt)
 values
-    (1, 37.5599277853801, 126.975359779271, '서울 숭례문 (서울 崇禮門)', 'heritage', '8730e1d8cffffff', '8830e1d8c5fffff','8930e1d8c4bffff','8a30e1d8c487fff','8b30e1d8c484fff','8c30e1d8c4841ff', '2024-04-25','2024-04-25'),
-    (2, 37.5706125034675, 126.988058695758, '서울 원각사지 십층석탑 (서울 圓覺寺址 十層石塔)', 'heritage', '8730e1d8cffffff', '8830e1d8c3fffff', '8930e1d8c23ffff', '8a30e1d8c22ffff', '8b30e1d8c229fff', '8c30e1d8c4842ff','2024-04-25','2024-04-25'),
-    (3, 37.5427691121748, 126.966031112156, 'KLO첩보대 훈련교육대 터', 'korean-war','8730e1d83ffffff', '8830e1d833fffff', '8930e1d8323ffff', '8a30e1d83227fff', '8b30e1d83223fff', '8c30e1d832235ff' ,'2024-04-25','2024-04-25'),
-    (4, 37.5387252714359, 127.125141751389, '에덴모자원 터', 'korean-war', '8730e1cf4ffffff', '8830e1cf4bfffff', '8930e1cf4a3ffff', '8a30e1cf4a27fff', '8b30e1cf4a26fff', '8c30e1cf4a263ff','2024-04-25', '2024-04-25'),
-    (5, 37.5808043433810, 126.986924045177, '3·1운동 단일화 합의 장소', 'liberation-movement','8730e1dabffffff', '8830e1dab7fffff', '8930e1dab6fffff', '8a30e1dab6f7fff', '8b30e1dab6f0fff', '8c30e1dab6f07ff' ,'2024-04-25','2024-04-25'),
-    (6, 37.5625131235612, 126.979717419003,'선은전광장 3·1운동 만세시위지', 'liberation-movement','8730e1d8cffffff', '8830e1d8c5fffff', '8930e1d8c47ffff', '8a30e1d8c45ffff', '8b30e1d8c45bfff', '8c30e1d8c45b9ff','2024-04-25','2024-04-25');
+    (1, 37.5599277853801, 126.975359779271, '서울 숭례문 (서울 崇禮門)', '문화재', '8730e1d8cffffff', '8830e1d8c5fffff','8930e1d8c4bffff','8a30e1d8c487fff','8b30e1d8c484fff','8c30e1d8c4841ff', '2024-04-25','2024-04-25'),
+    (2, 37.5706125034675, 126.988058695758, '서울 원각사지 십층석탑 (서울 圓覺寺址 十層石塔)', '문화재', '8730e1d8cffffff', '8830e1d8c3fffff', '8930e1d8c23ffff', '8a30e1d8c22ffff', '8b30e1d8c229fff', '8c30e1d8c4842ff','2024-04-25','2024-04-25'),
+    (3, 37.5427691121748, 126.966031112156, 'KLO첩보대 훈련교육대 터', '6·25전쟁','8730e1d83ffffff', '8830e1d833fffff', '8930e1d8323ffff', '8a30e1d83227fff', '8b30e1d83223fff', '8c30e1d832235ff' ,'2024-04-25','2024-04-25'),
+    (4, 37.5387252714359, 127.125141751389, '에덴모자원 터', '6·25전쟁', '8730e1cf4ffffff', '8830e1cf4bfffff', '8930e1cf4a3ffff', '8a30e1cf4a27fff', '8b30e1cf4a26fff', '8c30e1cf4a263ff','2024-04-25', '2024-04-25'),
+    (5, 37.5808043433810, 126.986924045177, '3·1운동 단일화 합의 장소', '3·1운동','8730e1dabffffff', '8830e1dab7fffff', '8930e1dab6fffff', '8a30e1dab6f7fff', '8b30e1dab6f0fff', '8c30e1dab6f07ff' ,'2024-04-25','2024-04-25'),
+    (6, 37.5625131235612, 126.979717419003,'선은전광장 3·1운동 만세시위지', '3·1운동','8730e1d8cffffff', '8830e1d8c5fffff', '8930e1d8c47ffff', '8a30e1d8c45ffff', '8b30e1d8c45bfff', '8c30e1d8c45b9ff','2024-04-25','2024-04-25');
 
 -- 문화재
 insert into Heritage(id, history_id, type, label, registeredAt, era, address, description)
