@@ -5,6 +5,7 @@ import lombok.Builder;
 
 @Builder
 public record HistoryMapResponseDto(
+    Long id,
     Double lat,
     Double lng,
     String name,
@@ -13,6 +14,7 @@ public record HistoryMapResponseDto(
 
     public static HistoryMapResponseDto from(History history) {
         return HistoryMapResponseDto.builder()
+            .id(history.getId())
             .lat(history.getLat())
             .lng(history.getLng())
             .name(history.getName())
