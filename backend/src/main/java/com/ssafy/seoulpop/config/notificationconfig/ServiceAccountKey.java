@@ -1,4 +1,4 @@
-package com.ssafy.seoulpop.config.alertconfig;
+package com.ssafy.seoulpop.config.notificationconfig;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
