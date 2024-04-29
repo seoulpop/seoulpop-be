@@ -26,8 +26,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
     transactionManagerRef = "secondTransactionManager",
     basePackages = {
         "com.ssafy.seoulpop.history.repository",
-        "com.ssafy.seoulpop.heritage.repository",
-        "com.ssafy.seoulpop.site.repository"
+        "com.ssafy.seoulpop.image.repository"
     }
 )
 public class SecondDbConfig {
@@ -61,10 +60,7 @@ public class SecondDbConfig {
             .dataSource(dataSource)
             .packages(
                 "com.ssafy.seoulpop.history.domain",
-                "com.ssafy.seoulpop.heritage.domain",
-                "com.ssafy.seoulpop.site.domain",
-                "com.ssafy.seoulpop.heritage.image",
-                "com.ssafy.seoulpop.site.image"
+                "com.ssafy.seoulpop.image.domain"
             ) // Second DB를 사용하는 모델 패키지 경로
             .persistenceUnit("second")
             .properties(properties)
