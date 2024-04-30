@@ -10,7 +10,7 @@ public record HistoryMapResponseDto(
     Double lat,
     Double lng,
     String name,
-    HistoryCategory category
+    String category
 ) {
 
     public static HistoryMapResponseDto from(History history) {
@@ -19,7 +19,7 @@ public record HistoryMapResponseDto(
             .lat(history.getLat())
             .lng(history.getLng())
             .name(history.getName())
-            .category(history.getCategory())
+            .category(history.getCategory().getDescription())
             .build();
     }
 }
