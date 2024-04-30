@@ -1,11 +1,11 @@
-package com.ssafy.seoulpop.site.image;
+package com.ssafy.seoulpop.image.domain;
 
 import com.ssafy.seoulpop.common.BaseEntity;
-import com.ssafy.seoulpop.site.domain.Site;
+import com.ssafy.seoulpop.history.domain.History;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,14 +20,14 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-public class SiteImage extends BaseEntity {
+public class Image extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "site_id")
-    private Site site;
+    @JoinColumn(name = "history_id")
+    private History history;
 
     @NonNull
-    @Lob
+    @Column(columnDefinition = "MEDIUMTEXT")
     private String imageUrl;
 
     @NonNull

@@ -1,4 +1,4 @@
-package com.ssafy.seoulpop.site.domain.type;
+package com.ssafy.seoulpop.history.domain.type;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
