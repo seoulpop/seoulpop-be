@@ -7,7 +7,6 @@ import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
 public class AtlasRepositoryImpl implements AtlasRepositoryCustom {
@@ -17,6 +16,7 @@ public class AtlasRepositoryImpl implements AtlasRepositoryCustom {
     @Override
     public List<Tuple> findHistoryAndAtlas(long memberId) {
         return jpaQueryFactory.select(history.id, history.category, history.name, history.atlasImageUrl, atlas.id)
+            .from(history)
             .leftJoin(atlas).on(atlas.history.id.eq(history.id).and(atlas.member.id.eq(memberId)))
             .orderBy(history.category.asc())
             .fetch();
