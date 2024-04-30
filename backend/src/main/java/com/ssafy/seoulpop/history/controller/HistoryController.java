@@ -1,6 +1,7 @@
 package com.ssafy.seoulpop.history.controller;
 
 import com.ssafy.seoulpop.history.dto.HistoryMapResponseDto;
+import com.ssafy.seoulpop.history.dto.NearByHistoryResponseDto;
 import com.ssafy.seoulpop.history.service.HistoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,5 +31,18 @@ public class HistoryController {
             return ResponseEntity.ok(historyService.readHistoryList());
         }
         return ResponseEntity.ok(historyService.readHistoryList(category));
+    }
+
+    @Operation(
+        summary = "주변 역사 조회",
+        description = "주변 역사를 조회하며 level에 따라 다른 범위를 조회함"
+    )
+    @GetMapping("/carousels")
+    public ResponseEntity<List<NearByHistoryResponseDto>> getNearByHistoryList(
+        @RequestParam double lat,
+        @RequestParam double lng,
+        @RequestParam int level
+    ) {
+        return ResponseEntity.ok(historyService.readNearByHistoryList(lat, lng, level));
     }
 }
