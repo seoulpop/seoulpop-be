@@ -19,7 +19,7 @@ public record HistoryMapResponseDto(
             .lat(history.getLat())
             .lng(history.getLng())
             .name(history.getName())
-            .category(history.getCategory().getDescription())
+            .category(history.getCategory())
             .build();
     }
 }

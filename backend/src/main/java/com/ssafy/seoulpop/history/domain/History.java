@@ -40,8 +40,7 @@ public class History extends BaseEntity {
     private String name;
 
     @NonNull
-    @Enumerated(EnumType.STRING)
-    private HistoryCategory category;
+    private String category;
 
     @NonNull
     private String thumbnail;
