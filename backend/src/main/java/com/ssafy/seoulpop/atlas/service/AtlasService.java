@@ -22,8 +22,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AtlasService {
 
-    //TODO: Redis 적용
-
     private final AtlasRepository atlasRepository;
     private final MemberRepository memberRepository;
     private final HistoryRepository historyRepository;
