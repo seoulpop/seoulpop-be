@@ -16,7 +16,7 @@ public class AtlasRepositoryImpl implements AtlasRepositoryCustom {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<AtlasInfoResponseDto> findAtlasInfo(long memberId) {
+    public List<AtlasInfoResponseDto> findAtlasInfoByMemberId(long memberId) {
         return jpaQueryFactory.select(Projections.constructor(AtlasInfoResponseDto.class,
                 history.id,
                 history.category,
