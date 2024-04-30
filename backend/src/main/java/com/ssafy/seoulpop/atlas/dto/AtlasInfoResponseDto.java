@@ -3,7 +3,7 @@ package com.ssafy.seoulpop.atlas.dto;
 import lombok.Builder;
 
 @Builder
-public record AtlasInfoResponse(
+public record AtlasInfoResponseDto(
     Long historyId,
     String historyCategory,
     String historyName,
