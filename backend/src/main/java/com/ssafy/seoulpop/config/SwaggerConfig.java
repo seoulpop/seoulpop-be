@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
     info = @Info(title = "SEOUL-POP (서울팝)",
         description = "SEOUL-POP api document",
         version = "v1"),
-    servers = {@Server(url = "https://api.tempdeploy.site", description = "Default Server URL")})
+    servers = {@Server(url = "https://api.seoul-pop.com", description = "Default Server URL")})
 @RequiredArgsConstructor
 @Configuration
 public class SwaggerConfig {

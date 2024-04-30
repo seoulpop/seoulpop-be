@@ -1,5 +1,6 @@
 package com.ssafy.seoulpop.history.domain;
 
+import com.ssafy.seoulpop.atlas.domain.Atlas;
 import com.ssafy.seoulpop.common.BaseEntity;
 import com.ssafy.seoulpop.image.domain.Image;
 import jakarta.persistence.CascadeType;
@@ -68,6 +69,10 @@ public class History extends BaseEntity {
 
     @Embedded
     private Cell cell;
+
+    @OneToMany(mappedBy = "history", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Atlas> atlases = new ArrayList<>();
 
     @OneToMany(mappedBy = "history", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
