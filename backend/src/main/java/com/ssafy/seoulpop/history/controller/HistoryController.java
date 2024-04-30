@@ -39,9 +39,9 @@ public class HistoryController {
     )
     @GetMapping("/carousels")
     public ResponseEntity<List<NearByHistoryResponseDto>> getNearByHistoryList(
-        @RequestParam(required = true) float lat,
-        @RequestParam(required = true) float lng,
-        @RequestParam(required = true) int level
+        @RequestParam double lat,
+        @RequestParam double lng,
+        @RequestParam int level
     ) {
         return ResponseEntity.ok(historyService.readNearByHistoryList(lat, lng, level));
     }

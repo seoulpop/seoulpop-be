@@ -33,7 +33,7 @@ public class HistoryService {
         return historyRepository.findAllByCategory(category).stream().map(HistoryMapResponseDto::from).toList();
     }
 
-    public List<NearByHistoryResponseDto> readNearByHistoryList(float lat, float lng, int level) {
+    public List<NearByHistoryResponseDto> readNearByHistoryList(double lat, double lng, int level) {
         // 위 경도에서 셀 Index로 변환
         String cellIndex = h3.latLngToCellAddress(lat, lng, level);
         // 주변 셀 List 확보
