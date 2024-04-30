@@ -1,11 +1,14 @@
 package com.ssafy.seoulpop.history.domain;
 
 import com.ssafy.seoulpop.common.BaseEntity;
+import com.ssafy.seoulpop.history.domain.type.HistoryCategory;
 import com.ssafy.seoulpop.image.domain.Image;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
@@ -36,7 +39,8 @@ public class History extends BaseEntity {
     private String name;
 
     @NonNull
-    private String category;
+    @Enumerated(EnumType.STRING)
+    private HistoryCategory category;
 
     @NonNull
     private String thumbnail;
