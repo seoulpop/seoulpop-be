@@ -22,11 +22,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AtlasService {
 
+    //TODO: Redis 적용
+
     private final AtlasRepository atlasRepository;
     private final MemberRepository memberRepository;
     private final HistoryRepository historyRepository;
 
     public List<AtlasInfoResponse> readAtlas(Long memberId) {
+
         List<Tuple> findResult = atlasRepository.findHistoryAndAtlas(memberId);
 
         List<AtlasInfoResponse> atlasInfoList = new ArrayList<>();
@@ -47,7 +50,7 @@ public class AtlasService {
 
     public void createAtlas(Long memberId, Long historyId) {
         Member findMember = memberRepository.findById(memberId).orElseThrow(() -> new BaseException(ErrorCode.MEMBER_NOT_FOUND_ERROR));
-        History findHistory = historyRepository.findById(memberId).orElseThrow(() -> new BaseException(ErrorCode.HISTORY_NOT_FOUND_ERROR));
+        History findHistory = historyRepository.findById(historyId).orElseThrow(() -> new BaseException(ErrorCode.HISTORY_NOT_FOUND_ERROR));
 
         atlasRepository.save(Atlas.builder()
             .member(findMember)
