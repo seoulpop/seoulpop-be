@@ -10,6 +10,7 @@ import com.ssafy.seoulpop.history.repository.HistoryRepository;
 import com.ssafy.seoulpop.member.domain.Member;
 import com.ssafy.seoulpop.member.repository.MemberRepository;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,9 +30,13 @@ public class AtlasService {
         Member findMember = memberRepository.findById(memberId).orElseThrow(() -> new BaseException(ErrorCode.MEMBER_NOT_FOUND_ERROR));
         History findHistory = historyRepository.findById(historyId).orElseThrow(() -> new BaseException(ErrorCode.HISTORY_NOT_FOUND_ERROR));
 
-        atlasRepository.save(Atlas.builder()
-            .member(findMember)
-            .history(findHistory)
-            .build());
+        Optional<Atlas> findAtlas = atlasRepository.findByMember_IdAndHistory_Id(memberId, historyId);
+
+        if (findAtlas.isEmpty()) {
+            atlasRepository.save(Atlas.builder()
+                .member(findMember)
+                .history(findHistory)
+                .build());
+        }
     }
 }
