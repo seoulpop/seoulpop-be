@@ -7,7 +7,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class HistoryRepositoryCustomImpl implements HistoryRepositoryCustom {
+public class HistoryCustomRepositoryImpl implements HistoryCustomRepository {
 
     private final JPAQueryFactory queryFactory;
 
