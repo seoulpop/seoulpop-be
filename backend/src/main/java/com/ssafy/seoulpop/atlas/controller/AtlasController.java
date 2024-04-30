@@ -1,6 +1,6 @@
 package com.ssafy.seoulpop.atlas.controller;
 
-import com.ssafy.seoulpop.atlas.dto.AtlasInfoResponse;
+import com.ssafy.seoulpop.atlas.dto.AtlasInfoResponseDto;
 import com.ssafy.seoulpop.atlas.service.AtlasService;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
@@ -24,7 +24,7 @@ public class AtlasController {
         description = "회원별 도감 정보를 조회(RequestParam: 회원 아이디(임시))"
     )
     @GetMapping
-    public ResponseEntity<List<AtlasInfoResponse>> getAtlas(@RequestParam Long memberId) {
+    public ResponseEntity<List<AtlasInfoResponseDto>> getAtlas(@RequestParam Long memberId) {
         return ResponseEntity.ok(atlasService.readAtlas(memberId));
     }
 
