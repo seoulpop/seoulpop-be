@@ -22,10 +22,7 @@ public class AtlasService {
     private final HistoryRepository historyRepository;
 
     public List<AtlasInfoResponseDto> readAtlas(Long memberId) {
-
-        List<AtlasInfoResponseDto> findResult = atlasRepository.findAtlasInfo(memberId);
-
-        return findResult;
+        return atlasRepository.findAtlasInfo(memberId);
     }
 
     public void createAtlas(Long memberId, Long historyId) {
