@@ -26,7 +26,8 @@ public class AtlasController {
         description = "회원별 도감 정보를 조회(RequestParam: 회원 아이디(임시))"
     )
     @GetMapping
-    public ResponseEntity<List<AtlasInfoResponseDto>> getAtlas(@RequestParam Long memberId) {
+    public ResponseEntity<List<AtlasInfoResponseDto>> getAtlas() {
+        Long memberId = -100L;
         return ResponseEntity.ok(atlasService.readAtlas(memberId));
     }
 
@@ -36,7 +37,8 @@ public class AtlasController {
     )
     @PostMapping
     public ResponseEntity<Void> addAtlas(@RequestBody AtlasRegistRequestDto requestDto) {
-        atlasService.createAtlas(requestDto.memberId(), requestDto.historyId());
+        Long memberId = -100L;
+        atlasService.createAtlas(memberId, requestDto.historyId());
         return ResponseEntity.ok().build();
     }
 }
