@@ -26,11 +26,14 @@ public class HistoryController {
         description = "역사를 조회하며 카테고리기반 필터링이 가능함"
     )
     @GetMapping
-    public ResponseEntity<List<HistoryMapResponseDto>> getHistoryList(@RequestParam(required = false) String category) {
+    public ResponseEntity<List<HistoryMapResponseDto>> getHistoryList(
+        @RequestParam Long memberId,
+        @RequestParam(required = false) String category
+    ) {
         if (category == null) {
-            return ResponseEntity.ok(historyService.readHistoryList());
+            return ResponseEntity.ok(historyService.readHistoryList(memberId));
         }
-        return ResponseEntity.ok(historyService.readHistoryList(category));
+        return ResponseEntity.ok(historyService.readHistoryList(memberId, category));
     }
 
     @Operation(
@@ -39,10 +42,11 @@ public class HistoryController {
     )
     @GetMapping("/carousels")
     public ResponseEntity<List<NearByHistoryResponseDto>> getNearByHistoryList(
+        @RequestParam Long memberId,
         @RequestParam double lat,
         @RequestParam double lng,
         @RequestParam int level
     ) {
-        return ResponseEntity.ok(historyService.readNearByHistoryList(lat, lng, level));
+        return ResponseEntity.ok(historyService.readNearByHistoryList(memberId, lat, lng, level));
     }
 }
