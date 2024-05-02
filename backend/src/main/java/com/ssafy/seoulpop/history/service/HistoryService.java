@@ -1,7 +1,12 @@
 package com.ssafy.seoulpop.history.service;
 
+import com.ssafy.seoulpop.exception.BaseException;
+import com.ssafy.seoulpop.exception.ErrorCode;
+import com.ssafy.seoulpop.history.domain.History;
+import com.ssafy.seoulpop.history.dto.HeritageDto;
 import com.ssafy.seoulpop.history.dto.HistoryMapResponseDto;
 import com.ssafy.seoulpop.history.dto.NearByHistoryResponseDto;
+import com.ssafy.seoulpop.history.dto.SiteDto;
 import com.ssafy.seoulpop.history.repository.HistoryRepository;
 import com.uber.h3core.H3Core;
 import jakarta.annotation.PostConstruct;
@@ -40,5 +45,15 @@ public class HistoryService {
         List<String> cellList = new ArrayList<>(h3.gridDisk(cellIndex, 1));
 
         return historyRepository.findByCellList(memberId, level, cellList);
+    }
+
+    public Object readHistoryDetail(Long historyId) {
+        History historyDetail = historyRepository.findById(historyId)
+            .orElseThrow(() -> new BaseException(ErrorCode.HISTORY_NOT_FOUND_ERROR));
+
+        if (historyDetail.getCategory().equals("문화재")) {
+            return HeritageDto.from(historyDetail);
+        }
+        return SiteDto.from(historyDetail);
     }
 }
