@@ -9,16 +9,8 @@ public record HistoryMapResponseDto(
     Double lat,
     Double lng,
     String name,
-    String category
+    String category,
+    Boolean visited
 ) {
 
-    public static HistoryMapResponseDto from(History history) {
-        return HistoryMapResponseDto.builder()
-            .id(history.getId())
-            .lat(history.getLat())
-            .lng(history.getLng())
-            .name(history.getName())
-            .category(history.getCategory())
-            .build();
-    }
 }

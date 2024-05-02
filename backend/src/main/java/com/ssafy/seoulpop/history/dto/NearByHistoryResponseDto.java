@@ -11,7 +11,8 @@ public record NearByHistoryResponseDto(
     String name,
     String category,
     String thumbnail,
-    String address
+    String address,
+    Boolean visited
 ) {
     public static NearByHistoryResponseDto from(History history) {
         return NearByHistoryResponseDto.builder()
