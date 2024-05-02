@@ -1,6 +1,5 @@
 package com.ssafy.seoulpop.history.repository;
 
-import com.ssafy.seoulpop.history.domain.History;
 import com.ssafy.seoulpop.history.dto.HistoryMapResponseDto;
 import com.ssafy.seoulpop.history.dto.NearByHistoryResponseDto;
 import java.util.List;

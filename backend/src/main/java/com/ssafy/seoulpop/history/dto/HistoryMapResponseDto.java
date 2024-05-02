@@ -1,6 +1,5 @@
 package com.ssafy.seoulpop.history.dto;
 
-import com.ssafy.seoulpop.history.domain.History;
 import lombok.Builder;
 
 @Builder
