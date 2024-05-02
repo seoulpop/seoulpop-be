@@ -9,6 +9,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -54,8 +55,8 @@ public class HistoryController {
         summary = "역사 상세조회",
         description = "문화재, 역사사건에 따라 서로 다른 값들을 반환함"
     )
-    @GetMapping("/detail")
-    public ResponseEntity<?> getNearByHistoryList(@RequestParam Long historyId) {
+    @GetMapping("/{historyId}/detail")
+    public ResponseEntity<?> getNearByHistoryList(@PathVariable Long historyId) {
         return ResponseEntity.ok(historyService.readHistoryDetail(historyId));
     }
 
