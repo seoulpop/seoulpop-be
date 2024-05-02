@@ -8,8 +8,10 @@ import com.ssafy.seoulpop.history.dto.NearByHistoryResponseDto;
 import com.ssafy.seoulpop.history.service.HistoryService;
 import com.ssafy.seoulpop.notification.dto.NearestHistoryResponseDto;
 import com.ssafy.seoulpop.notification.dto.NotificationRequestDto;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,19 +20,21 @@ public class NotificationService {
 
     private static final int H3_CHECK_LEVEL = 9;
     private static final double EARTH_RADIUS_M = 6371000.0;
-    private final HistoryService historyService;
 
-    public String createNotification(NotificationRequestDto notificationRequestDto) {
-        List<NearByHistoryResponseDto> nearByHistoryList = historyService.readNearByHistoryList(notificationRequestDto.latitude(), notificationRequestDto.longitude(), H3_CHECK_LEVEL);
+    private final HistoryService historyService;
+    private final StringRedisTemplate redisTemplate;
+
+    public String createNotification(NotificationRequestDto notificationRequest) {
+        List<NearByHistoryResponseDto> nearByHistoryList = historyService.readNearByHistoryList(notificationRequest.latitude(), notificationRequest.longitude(), H3_CHECK_LEVEL);
 
         if (nearByHistoryList.isEmpty()) {
             return "전송할 알림이 없습니다.";
         }
 
-        NearestHistoryResponseDto nearestHistory = getNearestHistory(notificationRequestDto.latitude(), notificationRequestDto.longitude(), nearByHistoryList);
+        NearestHistoryResponseDto nearestHistory = getNearestHistory(notificationRequest, nearByHistoryList);
 
         //TODO: category별 알림 생성 필요
-        String fcmToken = notificationRequestDto.fcmToken();
+        String fcmToken = notificationRequest.fcmToken();
         Message message = Message.builder()
             .setToken(fcmToken)
             .setNotification(Notification.builder()
@@ -42,6 +46,7 @@ public class NotificationService {
 
         try {
             FirebaseMessaging.getInstance().send(message);
+            redisTemplate.opsForValue().set("notification:" + notificationRequest.memberId() + ":" + nearestHistory.historyId(), String.valueOf(LocalDate.now()));
             return "알림이 전송되었습니다.";
         } catch (FirebaseMessagingException e) {
             e.printStackTrace();
@@ -49,11 +54,17 @@ public class NotificationService {
         }
     }
 
-    //TODO: redis에 알림 전송 시간을 담아두고, 계산해서 전송(하루에 한 번)
-    public NearestHistoryResponseDto getNearestHistory(double memberLatitude, double memberLongitude, List<NearByHistoryResponseDto> nearByHistoryList) {
+    public NearestHistoryResponseDto getNearestHistory(NotificationRequestDto notificationRequest, List<NearByHistoryResponseDto> nearByHistoryList) {
+        double memberLatitude = notificationRequest.latitude();
+        double memberLongitude = notificationRequest.longitude();
+
         double minDistance = Double.MAX_VALUE;
         NearByHistoryResponseDto nearestHistory = null;
         for (NearByHistoryResponseDto nearByHistory : nearByHistoryList) {
+            if (!checkSendable(notificationRequest.memberId(), nearestHistory.id())) {
+                continue;
+            }
+
             double distance = calculateDistance(memberLatitude, memberLongitude, nearByHistory.lat(), nearByHistory.lng());
 
             if (distance < minDistance) {
@@ -68,6 +79,16 @@ public class NotificationService {
             .category(nearestHistory.category())
             .distance((int) minDistance)
             .build();
+    }
+
+    public boolean checkSendable(Long memberId, Long historyId) {
+        String checkKey = "notification:" + memberId + ":" + historyId;
+        String lastNotification = redisTemplate.opsForValue().get(checkKey);
+        if (lastNotification != null && LocalDate.parse(lastNotification).equals(LocalDate.now())) {
+            return false;
+        }
+
+        return true;
     }
 
     public double calculateDistance(double memberLatitude, double memberLongitude, double historyLat, double historyLng) {
