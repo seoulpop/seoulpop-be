@@ -49,4 +49,14 @@ public class HistoryController {
         Long memberId = -100L;
         return ResponseEntity.ok(historyService.readNearByHistoryList(memberId, lat, lng, level));
     }
+
+    @Operation(
+        summary = "역사 상세조회",
+        description = "문화재, 역사사건에 따라 서로 다른 값들을 반환함"
+    )
+    @GetMapping("/detail")
+    public ResponseEntity<?> getNearByHistoryList(@RequestParam Long historyId) {
+        return ResponseEntity.ok(historyService.readHistoryDetail(historyId));
+    }
+
 }
