@@ -27,9 +27,9 @@ public class HistoryController {
     )
     @GetMapping
     public ResponseEntity<List<HistoryMapResponseDto>> getHistoryList(
-        @RequestParam Long memberId,
         @RequestParam(required = false) String category
     ) {
+        Long memberId = -100L;
         if (category == null) {
             return ResponseEntity.ok(historyService.readHistoryList(memberId));
         }
@@ -42,11 +42,11 @@ public class HistoryController {
     )
     @GetMapping("/carousels")
     public ResponseEntity<List<NearByHistoryResponseDto>> getNearByHistoryList(
-        @RequestParam Long memberId,
         @RequestParam double lat,
         @RequestParam double lng,
         @RequestParam int level
     ) {
+        Long memberId = -100L;
         return ResponseEntity.ok(historyService.readNearByHistoryList(memberId, lat, lng, level));
     }
 }
