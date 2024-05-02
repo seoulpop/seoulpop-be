@@ -11,7 +11,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class AtlasRepositoryImpl implements AtlasRepositoryCustom {
+public class AtlasRepositoryCustomImpl implements AtlasRepositoryCustom {
 
     private final JPAQueryFactory jpaQueryFactory;
 
