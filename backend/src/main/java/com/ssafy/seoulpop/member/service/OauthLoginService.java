@@ -7,11 +7,10 @@ import com.ssafy.seoulpop.member.domain.Member;
 import com.ssafy.seoulpop.member.domain.authcode.AuthCodeRequestUrlProviderComposite;
 import com.ssafy.seoulpop.member.domain.client.OauthMemberClientComposite;
 import com.ssafy.seoulpop.member.domain.type.OauthServerType;
-import com.ssafy.seoulpop.member.dto.KakaoLogoutResponse;
 import com.ssafy.seoulpop.member.dto.LoginDto;
 import com.ssafy.seoulpop.member.dto.OauthDto;
+import com.ssafy.seoulpop.member.dto.SignUpRequest;
 import com.ssafy.seoulpop.member.repository.MemberRepository;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -19,8 +18,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class OauthService {
+public class OauthLoginService {
 
+    private final MemberService memberService;
     private final AuthCodeRequestUrlProviderComposite authCodeRequestUrlProviderComposite;
     private final OauthMemberClientComposite oauthMemberClientComposite;
     private final MemberRepository memberRepository;
@@ -41,24 +41,21 @@ public class OauthService {
         hashOperations.put(dto.member().getOauthId().getOauthServerId(), "oauthAccessToken", dto.accessToken());
 
         if (member == null) { // 가입하지 않은 유저일 경우
-            return LoginDto.builder()
-                .oauthId(dto.member().getOauthId().getOauthServerId())
-                .kakaoNickname(dto.member().getName())
-                .build();
+            return memberService.createMember(// 회원가입
+                SignUpRequest.builder()
+                    .oauthId(dto.member().getOauthId().getOauthServerId())
+                    .kakaoNickname(dto.member().getName())
+                    .build()
+            );
         } else if (member.getDeleted()) { // 탈퇴한 회원일 경우
             throw new BaseException(INVALID_MEMBER_WITHDRAWN);
         }
 
-        return LoginDto.builder()
+        return LoginDto.builder()// 로그인
             .oauthId(member.getOauthId().getOauthServerId())
             .kakaoNickname(member.getName())
             .accessToken(tokenService.createToken(member))
             .refreshToken(tokenService.createRefreshToken(member))
             .build();
-    }
-
-    public KakaoLogoutResponse logout(HttpServletResponse response, OauthServerType oauthServerType, String oauthId) {
-        tokenService.deleteHeader(response);
-        return oauthMemberClientComposite.logout(oauthServerType, oauthId);
     }
 }

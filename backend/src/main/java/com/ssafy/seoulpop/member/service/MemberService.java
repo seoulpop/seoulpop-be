@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    private final OauthService oauthService;
+    private final OauthLogoutService oauthLogoutService;
     private final TokenService tokenService;
 
     public LoginDto createMember(SignUpRequest request) {
@@ -29,6 +29,7 @@ public class MemberService {
         );
 
         return LoginDto.builder()
+            .oauthId(member.getOauthId().getOauthServerId())
             .kakaoNickname(member.getName())
             .accessToken(tokenService.createToken(member))
             .refreshToken(tokenService.createRefreshToken(member))
@@ -36,7 +37,7 @@ public class MemberService {
     }
 
     public void deleteMember(HttpServletResponse response, OauthServerType oauthServerType, Member member) {
-        oauthService.logout(response, oauthServerType, member.getOauthId().getOauthServerId()); // 카카오 로그아웃
+        oauthLogoutService.logout(response, oauthServerType, member.getOauthId().getOauthServerId()); // 카카오 로그아웃
         tokenService.deleteHeader(response); // header에서 accesstoken, refreshtoken 삭제
         member.setDeleted(true);
         memberRepository.save(member);

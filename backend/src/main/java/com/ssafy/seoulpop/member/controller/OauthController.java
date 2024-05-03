@@ -5,7 +5,8 @@ import com.ssafy.seoulpop.member.domain.type.OauthServerType;
 import com.ssafy.seoulpop.member.dto.KakaoLogoutResponse;
 import com.ssafy.seoulpop.member.dto.LoginDto;
 import com.ssafy.seoulpop.member.dto.LoginResponse;
-import com.ssafy.seoulpop.member.service.OauthService;
+import com.ssafy.seoulpop.member.service.OauthLoginService;
+import com.ssafy.seoulpop.member.service.OauthLogoutService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
@@ -27,7 +28,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1/oauth")
 public class OauthController {
 
-    private final OauthService oauthService;
+    private final OauthLoginService oauthLoginService;
+    private final OauthLogoutService oauthLogoutService;
 
     @SneakyThrows
     @GetMapping("/{oauthServerType}")
@@ -35,7 +37,7 @@ public class OauthController {
         @PathVariable OauthServerType oauthServerType,
         HttpServletResponse response
     ) {
-        String redirectUrl = oauthService.getAuthCodeRequestUrl(oauthServerType);
+        String redirectUrl = oauthLoginService.getAuthCodeRequestUrl(oauthServerType);
         response.sendRedirect(redirectUrl);
         return ResponseEntity.ok().build();
     }
@@ -58,7 +60,7 @@ public class OauthController {
         @RequestParam String code
     ) {
 
-        LoginDto login = oauthService.login(oauthServerType, code);
+        LoginDto login = oauthLoginService.login(oauthServerType, code);
 
         Cookie cookie = new Cookie("refreshToken", login.refreshToken());
         cookie.setHttpOnly(true);
@@ -88,6 +90,6 @@ public class OauthController {
         @PathVariable OauthServerType oauthServerType
     ) {
         return ResponseEntity.ok(
-            oauthService.logout(response, oauthServerType, member.getOauthId().getOauthServerId()));
+            oauthLogoutService.logout(response, oauthServerType, member.getOauthId().getOauthServerId()));
     }
 }
