@@ -48,6 +48,8 @@ public class History extends BaseEntity {
     @NonNull
     private String label;
 
+    private String arImage;
+
     @NonNull
     @Column(columnDefinition = "MEDIUMTEXT")
     private String description;
