@@ -1,6 +1,7 @@
 package com.ssafy.seoulpop.history.controller;
 
 import com.ssafy.seoulpop.history.dto.HistoryMapResponseDto;
+import com.ssafy.seoulpop.history.dto.NearByArResponseDto;
 import com.ssafy.seoulpop.history.dto.NearByHistoryResponseDto;
 import com.ssafy.seoulpop.history.service.HistoryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -60,4 +61,16 @@ public class HistoryController {
         return ResponseEntity.ok(historyService.readHistoryDetail(historyId));
     }
 
+    @Operation(
+        summary = "주변 AR 마커 조회",
+        description = "주변 역사를 조회하며 level에 따라 다른 범위를 조회함"
+    )
+    @GetMapping("/ar")
+    public ResponseEntity<List<NearByArResponseDto>> getNearByArList(
+        @RequestParam double lat,
+        @RequestParam double lng,
+        @RequestParam int level
+    ) {
+        return ResponseEntity.ok(historyService.readNearByArMarker(lat, lng, level));
+    }
 }
