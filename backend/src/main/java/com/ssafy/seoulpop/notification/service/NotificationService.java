@@ -4,15 +4,24 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
+import com.ssafy.seoulpop.exception.BaseException;
+import com.ssafy.seoulpop.exception.ErrorCode;
 import com.ssafy.seoulpop.history.dto.NearByHistoryResponseDto;
 import com.ssafy.seoulpop.history.service.HistoryService;
+import com.ssafy.seoulpop.notification.dto.FcmCookieRequestDto;
 import com.ssafy.seoulpop.notification.dto.NearestHistoryResponseDto;
 import com.ssafy.seoulpop.notification.dto.NotificationRequestDto;
-import java.time.LocalDate;
-import java.util.List;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,8 +33,17 @@ public class NotificationService {
     private final HistoryService historyService;
     private final StringRedisTemplate redisTemplate;
 
-    public String createNotification(NotificationRequestDto notificationRequest) {
-        List<NearByHistoryResponseDto> nearByHistoryList = historyService.readNearByHistoryList(notificationRequest.latitude(), notificationRequest.longitude(), H3_CHECK_LEVEL);
+    public String createCookie(HttpServletResponse response, FcmCookieRequestDto requestDto) {
+        ResponseCookie cookie = ResponseCookie.from("fcmToken", requestDto.fcmToken())
+                .path("/")
+                .maxAge(30 * 24 * 60 * 60)
+                .build();
+
+        return "쿠키 발급 완료";
+    }
+
+    public String createNotification(HttpServletRequest request, NotificationRequestDto notificationRequest) {
+        List<NearByHistoryResponseDto> nearByHistoryList = historyService.readNearByHistoryList(notificationRequest.memberId(), notificationRequest.latitude(), notificationRequest.longitude(), H3_CHECK_LEVEL);
 
         if (nearByHistoryList.isEmpty()) {
             return "전송할 알림이 없습니다.";
@@ -33,16 +51,20 @@ public class NotificationService {
 
         NearestHistoryResponseDto nearestHistory = getNearestHistory(notificationRequest, nearByHistoryList);
 
-        //TODO: category별 알림 생성 필요
-        String fcmToken = notificationRequest.fcmToken();
+        String fcmToken = Arrays.stream(request.getCookies())
+                .filter(cookie -> "fcmToken".equals(cookie.getName()))
+                .findFirst()
+                .map(Cookie::getValue)
+                .orElseThrow(() -> new BaseException(ErrorCode.FCM_TOKEN_NOT_FOUND_ERROR));
+
         Message message = Message.builder()
-            .setToken(fcmToken)
-            .setNotification(Notification.builder()
-                .setTitle("근처에 새로운   역사 장소가 있습니다!")
-                .setBody(nearestHistory.distance() + "m 떨어진 곳에 object가 위치!")
-                //.setImage("이미지")
-                .build())
-            .build();
+                .setToken(fcmToken)
+                .setNotification(Notification.builder()
+                        .setTitle("근처에 새로운   역사 장소가 있습니다!")
+                        .setBody(nearestHistory.distance() + "m 떨어진 곳에 object가 위치!")
+                        //.setImage("이미지")
+                        .build())
+                .build();
 
         try {
             FirebaseMessaging.getInstance().send(message);
@@ -55,9 +77,6 @@ public class NotificationService {
     }
 
     public NearestHistoryResponseDto getNearestHistory(NotificationRequestDto notificationRequest, List<NearByHistoryResponseDto> nearByHistoryList) {
-        double memberLatitude = notificationRequest.latitude();
-        double memberLongitude = notificationRequest.longitude();
-
         double minDistance = Double.MAX_VALUE;
         NearByHistoryResponseDto nearestHistory = null;
         for (NearByHistoryResponseDto nearByHistory : nearByHistoryList) {
@@ -65,7 +84,7 @@ public class NotificationService {
                 continue;
             }
 
-            double distance = calculateDistance(memberLatitude, memberLongitude, nearByHistory.lat(), nearByHistory.lng());
+            double distance = calculateDistance(notificationRequest.latitude(), notificationRequest.longitude(), nearByHistory.lat(), nearByHistory.lng());
 
             if (distance < minDistance) {
                 minDistance = distance;
@@ -74,11 +93,11 @@ public class NotificationService {
         }
 
         return NearestHistoryResponseDto.builder()
-            .historyId(nearestHistory.id())
-            .name(nearestHistory.name())
-            .category(nearestHistory.category())
-            .distance((int) minDistance)
-            .build();
+                .historyId(nearestHistory.id())
+                .name(nearestHistory.name())
+                .category(nearestHistory.category())
+                .distance((int) minDistance)
+                .build();
     }
 
     public boolean checkSendable(Long memberId, Long historyId) {
