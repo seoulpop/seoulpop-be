@@ -58,6 +58,7 @@ public class History extends BaseEntity {
 
     private String historicAddress; // SiteDto
 
+    @Column(columnDefinition = "MEDIUMTEXT")
     private String reference; // SiteDto
 
     @Column(columnDefinition = "datetime(0) default now(0)")
@@ -65,6 +66,7 @@ public class History extends BaseEntity {
 
     private String era; // HeritageDto
 
+    @Column(columnDefinition = "MEDIUMTEXT")
     private String atlasImageUrl; // HeritageDto
 
     @Embedded

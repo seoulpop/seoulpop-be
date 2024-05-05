@@ -9,6 +9,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,11 +27,14 @@ public class HistoryController {
         description = "역사를 조회하며 카테고리기반 필터링이 가능함"
     )
     @GetMapping
-    public ResponseEntity<List<HistoryMapResponseDto>> getHistoryList(@RequestParam(required = false) String category) {
+    public ResponseEntity<List<HistoryMapResponseDto>> getHistoryList(
+        @RequestParam(required = false) String category
+    ) {
+        Long memberId = -100L;
         if (category == null) {
-            return ResponseEntity.ok(historyService.readHistoryList());
+            return ResponseEntity.ok(historyService.readHistoryList(memberId));
         }
-        return ResponseEntity.ok(historyService.readHistoryList(category));
+        return ResponseEntity.ok(historyService.readHistoryList(memberId, category));
     }
 
     @Operation(
@@ -43,6 +47,17 @@ public class HistoryController {
         @RequestParam double lng,
         @RequestParam int level
     ) {
-        return ResponseEntity.ok(historyService.readNearByHistoryList(lat, lng, level));
+        Long memberId = -100L;
+        return ResponseEntity.ok(historyService.readNearByHistoryList(memberId, lat, lng, level));
     }
+
+    @Operation(
+        summary = "역사 상세조회",
+        description = "문화재, 역사사건에 따라 서로 다른 값들을 반환함"
+    )
+    @GetMapping("/{historyId}/detail")
+    public ResponseEntity<?> getNearByHistoryList(@PathVariable Long historyId) {
+        return ResponseEntity.ok(historyService.readHistoryDetail(historyId));
+    }
+
 }
