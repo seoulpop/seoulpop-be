@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface HistoryCustomRepository {
 
-    List<NearByHistoryResponseDto> findByMemberIdAndCellList(Long memberId, int level, List<String> cellList);
+    List<NearByHistoryResponseDto> findByMemberIdAndCellList(Long memberId, Integer level, List<String> cellList);
 
-    List<NearByArResponseDto> findByCellList(int level, List<String> cellList);
+    List<NearByArResponseDto> findByCellList(Integer level, List<String> cellList);
 
     List<HistoryMapResponseDto> findAllByMemberId(Long memberId);
 

@@ -20,13 +20,13 @@ public class HistoryCustomRepositoryImpl implements HistoryCustomRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<NearByHistoryResponseDto> findByMemberIdAndCellList(Long memberId, int level, List<String> cellList) {
+    public List<NearByHistoryResponseDto> findByMemberIdAndCellList(Long memberId, Integer level, List<String> cellList) {
         String cellIndexField = getCellIndexField(level);
         return nearByQuery(memberId, cellList, cellIndexField);
     }
 
     @Override
-    public List<NearByArResponseDto> findByCellList(int level, List<String> cellList) {
+    public List<NearByArResponseDto> findByCellList(Integer level, List<String> cellList) {
         String cellIndexField = getCellIndexField(level);
         return arQuery(cellList, cellIndexField);
     }
