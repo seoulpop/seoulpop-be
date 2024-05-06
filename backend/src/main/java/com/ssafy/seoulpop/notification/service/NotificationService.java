@@ -34,10 +34,11 @@ public class NotificationService {
     private final StringRedisTemplate redisTemplate;
 
     public String createCookie(HttpServletResponse response, FcmCookieRequestDto requestDto) {
-        ResponseCookie cookie = ResponseCookie.from("fcmToken", requestDto.fcmToken())
-                .path("/")
-                .maxAge(30 * 24 * 60 * 60)
-                .build();
+        Cookie cookie = new Cookie("fcmToken", requestDto.fcmToken());
+        cookie.setPath("/");
+        cookie.setMaxAge(30 * 24 * 60 * 60);
+
+        response.addCookie(cookie);
 
         return "쿠키 발급 완료";
     }
