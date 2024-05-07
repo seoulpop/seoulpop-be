@@ -48,6 +48,9 @@ public class History extends BaseEntity {
     @NonNull
     private String label;
 
+    @Column(columnDefinition = "MEDIUMTEXT")
+    private String arImage;
+
     @NonNull
     @Column(columnDefinition = "MEDIUMTEXT")
     private String description;
@@ -63,6 +66,9 @@ public class History extends BaseEntity {
 
     @Column(columnDefinition = "datetime(0) default now(0)")
     private LocalDateTime registeredAt; // HeritageDto
+
+    @Column(columnDefinition = "MEDIUMTEXT")
+    private String additionalInfo; //HeritageDto
 
     private String era; // HeritageDto
 
