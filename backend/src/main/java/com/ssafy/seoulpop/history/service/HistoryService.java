@@ -14,8 +14,11 @@ import com.uber.h3core.H3Core;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,6 +28,7 @@ public class HistoryService {
 
     private final HistoryRepository historyRepository;
     private final MemberRepository memberRepository;
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private H3Core h3;
 
@@ -54,8 +58,11 @@ public class HistoryService {
 
 
     public Object readHistoryDetail(Long historyId) {
-        History historyDetail = historyRepository.findById(historyId)
+        History historyDetail = historyRepository.findByIdWithImages(historyId)
             .orElseThrow(() -> new BaseException(ErrorCode.HISTORY_NOT_FOUND_ERROR));
+
+        log.info("\n [해당 이미지 수] \n {}", historyDetail.getImages().size());
+
         if (historyDetail.getCategory().equals("문화재")) {
             return HeritageDto.from(historyDetail);
         }
