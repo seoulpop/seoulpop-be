@@ -42,7 +42,7 @@ public class NotificationService {
     }
 
     public String createNotification(HttpServletRequest request, NotificationRequestDto notificationRequest) {
-        List<NearByHistoryResponseDto> nearByHistoryList = historyService.readNearByHistoryList(notificationRequest.memberId(), notificationRequest.latitude(), notificationRequest.longitude(),
+        List<NearByHistoryResponseDto> nearByHistoryList = historyService.readNearByHistoryList(notificationRequest.memberId(), notificationRequest.lat(), notificationRequest.lng(),
             H3_CHECK_LEVEL);
 
         if (nearByHistoryList.isEmpty()) {
@@ -84,7 +84,7 @@ public class NotificationService {
                 continue;
             }
 
-            double distance = calculateDistance(notificationRequest.latitude(), notificationRequest.longitude(), nearByHistory.lat(), nearByHistory.lng());
+            double distance = calculateDistance(notificationRequest.lat(), notificationRequest.lng(), nearByHistory.lat(), nearByHistory.lng());
 
             if (distance < minDistance) {
                 minDistance = distance;
@@ -92,6 +92,7 @@ public class NotificationService {
             }
         }
 
+        //TODO: nearest null일 때 처리
         return NearestHistoryResponseDto.builder()
             .historyId(nearestHistory.id())
             .name(nearestHistory.name())
@@ -111,6 +112,8 @@ public class NotificationService {
     }
 
     public double calculateDistance(double memberLatitude, double memberLongitude, double historyLat, double historyLng) {
+        //TODO: 위경도 유효성 검사
+
         //위도와 경도 라디안 변환
         double memberLatRad = Math.toRadians(memberLatitude);
         double memberLngRad = Math.toRadians(memberLongitude);
