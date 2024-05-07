@@ -14,14 +14,12 @@ import com.ssafy.seoulpop.notification.dto.NotificationRequestDto;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.ResponseCookie;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +42,8 @@ public class NotificationService {
     }
 
     public String createNotification(HttpServletRequest request, NotificationRequestDto notificationRequest) {
-        List<NearByHistoryResponseDto> nearByHistoryList = historyService.readNearByHistoryList(notificationRequest.memberId(), notificationRequest.latitude(), notificationRequest.longitude(), H3_CHECK_LEVEL);
+        List<NearByHistoryResponseDto> nearByHistoryList = historyService.readNearByHistoryList(notificationRequest.memberId(), notificationRequest.latitude(), notificationRequest.longitude(),
+            H3_CHECK_LEVEL);
 
         if (nearByHistoryList.isEmpty()) {
             return "전송할 알림이 없습니다.";
@@ -53,19 +52,19 @@ public class NotificationService {
         NearestHistoryResponseDto nearestHistory = getNearestHistory(notificationRequest, nearByHistoryList);
 
         String fcmToken = Arrays.stream(request.getCookies())
-                .filter(cookie -> "fcmToken".equals(cookie.getName()))
-                .findFirst()
-                .map(Cookie::getValue)
-                .orElseThrow(() -> new BaseException(ErrorCode.FCM_TOKEN_NOT_FOUND_ERROR));
+            .filter(cookie -> "fcmToken".equals(cookie.getName()))
+            .findFirst()
+            .map(Cookie::getValue)
+            .orElseThrow(() -> new BaseException(ErrorCode.FCM_TOKEN_NOT_FOUND_ERROR));
 
         Message message = Message.builder()
-                .setToken(fcmToken)
-                .setNotification(Notification.builder()
-                        .setTitle("근처에 새로운   역사 장소가 있습니다!")
-                        .setBody(nearestHistory.distance() + "m 떨어진 곳에 object가 위치!")
-                        //.setImage("이미지")
-                        .build())
-                .build();
+            .setToken(fcmToken)
+            .setNotification(Notification.builder()
+                .setTitle("근처에 새로운   역사 장소가 있습니다!")
+                .setBody(nearestHistory.distance() + "m 떨어진 곳에 object가 위치!")
+                //.setImage("이미지")
+                .build())
+            .build();
 
         try {
             FirebaseMessaging.getInstance().send(message);
@@ -81,7 +80,7 @@ public class NotificationService {
         double minDistance = Double.MAX_VALUE;
         NearByHistoryResponseDto nearestHistory = null;
         for (NearByHistoryResponseDto nearByHistory : nearByHistoryList) {
-            if (!checkSendable(notificationRequest.memberId(), nearestHistory.id())) {
+            if (!checkSendable(notificationRequest.memberId(), nearByHistory.id())) {
                 continue;
             }
 
@@ -94,11 +93,11 @@ public class NotificationService {
         }
 
         return NearestHistoryResponseDto.builder()
-                .historyId(nearestHistory.id())
-                .name(nearestHistory.name())
-                .category(nearestHistory.category())
-                .distance((int) minDistance)
-                .build();
+            .historyId(nearestHistory.id())
+            .name(nearestHistory.name())
+            .category(nearestHistory.category())
+            .distance((int) minDistance)
+            .build();
     }
 
     public boolean checkSendable(Long memberId, Long historyId) {
