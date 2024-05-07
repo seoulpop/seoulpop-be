@@ -32,7 +32,6 @@ public class AtlasService {
 
         Optional<Atlas> findAtlas = atlasRepository.findByMember_IdAndHistory_Id(memberId, historyId);
 
-        //방문횟수 관리 추가 필요
         if (findAtlas.isEmpty()) {
             atlasRepository.save(Atlas.builder()
                 .member(findMember)
