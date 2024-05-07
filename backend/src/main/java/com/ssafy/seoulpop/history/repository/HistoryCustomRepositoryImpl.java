@@ -2,16 +2,19 @@ package com.ssafy.seoulpop.history.repository;
 
 import static com.ssafy.seoulpop.atlas.domain.QAtlas.atlas;
 import static com.ssafy.seoulpop.history.domain.QHistory.history;
+import static com.ssafy.seoulpop.image.domain.QImage.image;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.ssafy.seoulpop.history.domain.History;
 import com.ssafy.seoulpop.history.dto.HistoryMapResponseDto;
 import com.ssafy.seoulpop.history.dto.NearByArResponseDto;
 import com.ssafy.seoulpop.history.dto.NearByHistoryResponseDto;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -60,6 +63,17 @@ public class HistoryCustomRepositoryImpl implements HistoryCustomRepository {
             .where(history.category.eq(category))
             .orderBy(history.category.asc())
             .fetch();
+    }
+
+    @Override
+    public Optional<History> findByIdWithImages(Long historyId) {
+        History historyDetail = queryFactory
+                .selectFrom(history)
+                .leftJoin(history.images, image).fetchJoin()
+                .where(history.id.eq(historyId))
+                .fetchOne();
+
+        return Optional.ofNullable(historyDetail);
     }
 
     private String getCellIndexField(int level) {
