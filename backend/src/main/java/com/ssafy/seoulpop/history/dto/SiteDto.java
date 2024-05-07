@@ -1,7 +1,6 @@
 package com.ssafy.seoulpop.history.dto;
 
 import com.ssafy.seoulpop.history.domain.History;
-import com.ssafy.seoulpop.image.domain.Image;
 import com.ssafy.seoulpop.image.dto.ImageDto;
 import java.util.List;
 import lombok.Builder;

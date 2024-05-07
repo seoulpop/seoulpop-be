@@ -14,7 +14,6 @@ import com.uber.h3core.H3Core;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
