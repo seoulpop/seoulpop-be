@@ -4,10 +4,10 @@ import lombok.Builder;
 
 @Builder
 public record NearestHistoryResponseDto(
-    Long historyId,
-    String name,
-    String category,
-    Integer distance
+        Long historyId,
+        String name,
+        String category,
+        Integer distance
 ) {
 
 }
