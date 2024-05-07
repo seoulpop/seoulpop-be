@@ -69,9 +69,9 @@ public class HistoryCustomRepositoryImpl implements HistoryCustomRepository {
     public Optional<History> findByIdWithImages(Long historyId) {
         History historyDetail = queryFactory
                 .selectFrom(history)
-                .leftJoin(history.images, image).fetchJoin() // images와 조인하고 결과에 포함
+                .leftJoin(history.images, image).fetchJoin()
                 .where(history.id.eq(historyId))
-                .fetchOne(); // 단일 결과 가져오기
+                .fetchOne();
 
         return Optional.ofNullable(historyDetail);
     }
