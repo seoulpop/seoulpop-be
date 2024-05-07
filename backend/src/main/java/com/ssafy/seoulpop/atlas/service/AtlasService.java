@@ -37,6 +37,11 @@ public class AtlasService {
                 .member(findMember)
                 .history(findHistory)
                 .build());
+            return;
         }
+
+        Atlas atlas = findAtlas.get();
+        atlas.updateVisitCnt();
+        atlasRepository.save(atlas);
     }
 }

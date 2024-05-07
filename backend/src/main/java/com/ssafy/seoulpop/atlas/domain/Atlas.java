@@ -11,7 +11,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 
 @Getter
 @Setter
@@ -28,4 +30,12 @@ public class Atlas extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "history_id")
     private History history;
+
+    @NonNull
+    @ColumnDefault("1")
+    private Integer visitCnt;
+
+    public void updateVisitCnt() {
+        this.visitCnt++;
+    }
 }
