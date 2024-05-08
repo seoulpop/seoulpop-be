@@ -20,6 +20,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -36,11 +37,15 @@ public class NotificationService {
     public String createCookie(HttpServletResponse response, FcmCookieRequestDto requestDto) {
         //TODO: 쿠키 만료되면? 어떻게? Redis로 해야할듯?
         log.info("쿠키 발급 요청 접수, fcmToken: {}", requestDto.fcmToken());
-        Cookie cookie = new Cookie("fcmToken", requestDto.fcmToken());
-        cookie.setPath("/");
-        cookie.setMaxAge(30 * 24 * 60 * 60);
+        ResponseCookie cookie = ResponseCookie.from("fcmToken", requestDto.fcmToken())
+            .path("/")
+            .sameSite("None")
+            .maxAge(30 * 24 * 60 * 60)
+            .secure(true)
+            .httpOnly(true)
+            .build();
 
-        response.addCookie(cookie);
+        response.addHeader("Set-Cookie", cookie.toString());
         log.info("쿠키 발급 완료");
         return "쿠키 발급 완료";
     }
@@ -128,7 +133,11 @@ public class NotificationService {
     }
 
     private String readFcmToken(HttpServletRequest request) {
-        return Arrays.stream(request.getCookies())
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            throw new BaseException(ErrorCode.FCM_TOKEN_NOT_FOUND_ERROR);  // 쿠키가 없으면 예외를 던짐
+        }
+        return Arrays.stream(cookies)
             .filter(cookie -> "fcmToken".equals(cookie.getName()))
             .findFirst()
             .map(Cookie::getValue)
