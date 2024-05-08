@@ -18,9 +18,11 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
@@ -32,43 +34,36 @@ public class NotificationService {
     private final StringRedisTemplate redisTemplate;
 
     public String createCookie(HttpServletResponse response, FcmCookieRequestDto requestDto) {
+        //TODO: 쿠키 만료되면? 어떻게? Redis로 해야할듯?
+        log.info("쿠키 발급 요청 접수, fcmToken: {}", requestDto.fcmToken());
         Cookie cookie = new Cookie("fcmToken", requestDto.fcmToken());
         cookie.setPath("/");
         cookie.setMaxAge(30 * 24 * 60 * 60);
 
         response.addCookie(cookie);
-
+        log.info("쿠키 발급 완료");
         return "쿠키 발급 완료";
     }
 
-    public String createNotification(HttpServletRequest request, NotificationRequestDto notificationRequest) {
-        List<NearByHistoryResponseDto> nearByHistoryList = historyService.readNearByHistoryList(notificationRequest.memberId(), notificationRequest.lat(), notificationRequest.lng(),
-            H3_CHECK_LEVEL);
+    public String sendNotification(HttpServletRequest request, NotificationRequestDto notificationRequest) {
+        List<NearByHistoryResponseDto> nearByHistoryList = historyService.readNearByHistoryList(notificationRequest.memberId(),
+            notificationRequest.lat(), notificationRequest.lng(), H3_CHECK_LEVEL);
 
         if (nearByHistoryList.isEmpty()) {
+            log.info("주변에 역사 장소가 없습니다.");
             return "전송할 알림이 없습니다.";
         }
 
-        NearestHistoryResponseDto nearestHistory = getNearestHistory(notificationRequest, nearByHistoryList);
+        NearestHistoryResponseDto nearestHistory = findNearestHistory(notificationRequest, nearByHistoryList);
 
-        String fcmToken = Arrays.stream(request.getCookies())
-            .filter(cookie -> "fcmToken".equals(cookie.getName()))
-            .findFirst()
-            .map(Cookie::getValue)
-            .orElseThrow(() -> new BaseException(ErrorCode.FCM_TOKEN_NOT_FOUND_ERROR));
+        String fcmToken = readFcmToken(request);
 
-        Message message = Message.builder()
-            .setToken(fcmToken)
-            .setNotification(Notification.builder()
-                .setTitle("근처에 새로운   역사 장소가 있습니다!")
-                .setBody(nearestHistory.distance() + "m 떨어진 곳에 object가 위치!")
-                //.setImage("이미지")
-                .build())
-            .build();
+        Message message = createMessage(nearestHistory, fcmToken);
 
         try {
             FirebaseMessaging.getInstance().send(message);
             redisTemplate.opsForValue().set("notification:" + notificationRequest.memberId() + ":" + nearestHistory.historyId(), String.valueOf(LocalDate.now()));
+            log.info("알림이 전송되었습니다.");
             return "알림이 전송되었습니다.";
         } catch (FirebaseMessagingException e) {
             e.printStackTrace();
@@ -76,13 +71,13 @@ public class NotificationService {
         }
     }
 
-    public NearestHistoryResponseDto getNearestHistory(NotificationRequestDto notificationRequest, List<NearByHistoryResponseDto> nearByHistoryList) {
+    private NearestHistoryResponseDto findNearestHistory(NotificationRequestDto notificationRequest, List<NearByHistoryResponseDto> nearByHistoryList) {
         double minDistance = Double.MAX_VALUE;
         NearByHistoryResponseDto nearestHistory = null;
         for (NearByHistoryResponseDto nearByHistory : nearByHistoryList) {
-            if (!checkSendable(notificationRequest.memberId(), nearByHistory.id())) {
-                continue;
-            }
+            //if (!checkSendable(notificationRequest.memberId(), nearByHistory.id())) {
+            //    continue;
+            //}
 
             double distance = calculateDistance(notificationRequest.lat(), notificationRequest.lng(), nearByHistory.lat(), nearByHistory.lng());
 
@@ -101,7 +96,7 @@ public class NotificationService {
             .build();
     }
 
-    public boolean checkSendable(Long memberId, Long historyId) {
+    private boolean checkSendable(Long memberId, Long historyId) {
         String checkKey = "notification:" + memberId + ":" + historyId;
         String lastNotification = redisTemplate.opsForValue().get(checkKey);
         if (lastNotification != null && LocalDate.parse(lastNotification).equals(LocalDate.now())) {
@@ -111,7 +106,7 @@ public class NotificationService {
         return true;
     }
 
-    public double calculateDistance(double memberLatitude, double memberLongitude, double historyLat, double historyLng) {
+    private double calculateDistance(double memberLatitude, double memberLongitude, double historyLat, double historyLng) {
         //TODO: 위경도 유효성 검사
 
         //위도와 경도 라디안 변환
@@ -130,5 +125,25 @@ public class NotificationService {
 
         // 최종 거리 계산 (미터 단위)
         return EARTH_RADIUS_M * centralAngle;
+    }
+
+    private String readFcmToken(HttpServletRequest request) {
+        return Arrays.stream(request.getCookies())
+            .filter(cookie -> "fcmToken".equals(cookie.getName()))
+            .findFirst()
+            .map(Cookie::getValue)
+            .orElseThrow(() -> new BaseException(ErrorCode.FCM_TOKEN_NOT_FOUND_ERROR));
+    }
+
+    private Message createMessage(NearestHistoryResponseDto nearestHistory, String fcmToken) {
+        String noficiationBody = "아이디 : " + nearestHistory.historyId() + ", 이름 : " + nearestHistory.name() + ", 종류 : " + nearestHistory.category() + ", 거리 : " + nearestHistory.distance();
+        log.info("알림 정보 :{}", noficiationBody);
+        return Message.builder()
+            .setToken(fcmToken)
+            .setNotification(Notification.builder()
+                .setTitle("역사 정보")
+                .setBody(noficiationBody)
+                .setImage(null).build())
+            .build();
     }
 }

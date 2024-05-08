@@ -4,6 +4,7 @@ import com.ssafy.seoulpop.atlas.dto.AtlasInfoResponseDto;
 import com.ssafy.seoulpop.atlas.dto.AtlasRegistRequestDto;
 import com.ssafy.seoulpop.atlas.service.AtlasService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,9 +12,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Tag(name = "도감 컨트롤러", description = "회원별 도감 정보 조회, 도감 등록 기능이 포함되어 있다")
 @RestController
 @RequestMapping("v1/atlases")
 @RequiredArgsConstructor
