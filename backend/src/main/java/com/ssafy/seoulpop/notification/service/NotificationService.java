@@ -17,6 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class NotificationService {
 
+    //check level : 7 ~ 13
     private static final int H3_CHECK_LEVEL = 9;
     private static final double EARTH_RADIUS_M = 6371000.0;
 
@@ -35,12 +37,11 @@ public class NotificationService {
     private final StringRedisTemplate redisTemplate;
 
     public String createCookie(HttpServletResponse response, FcmCookieRequestDto requestDto) {
-        //TODO: 쿠키 만료되면? 어떻게? Redis로 해야할듯?
-        log.info("쿠키 발급 요청 접수, fcmToken: {}", requestDto.fcmToken());
+        log.debug("쿠키 발급 요청 접수, fcmToken: {}", requestDto.fcmToken());
         ResponseCookie cookie = ResponseCookie.from("fcmToken", requestDto.fcmToken())
             .path("/")
             .sameSite("None")
-            .maxAge(30 * 24 * 60 * 60)
+            .maxAge(30L * 24 * 60 * 60)
             .secure(true)
             .httpOnly(true)
             .build();
@@ -51,16 +52,21 @@ public class NotificationService {
     }
 
     public String sendNotification(HttpServletRequest request, NotificationRequestDto notificationRequest) {
-        log.info("알림 전송 요청 접수, noficationRequest : {}", notificationRequest.toString());
+        log.debug("알림 전송 요청 접수, noficationRequest : {}", notificationRequest.toString());
         List<NearByHistoryResponseDto> nearByHistoryList = historyService.readNearByHistoryList(notificationRequest.memberId(),
             notificationRequest.lat(), notificationRequest.lng(), H3_CHECK_LEVEL);
 
         if (nearByHistoryList.isEmpty()) {
-            log.info("주변에 역사 장소가 없습니다.");
+            log.info("전송할 알림이 없어 종료되었습니다.");
             return "전송할 알림이 없습니다.";
         }
 
-        NearestHistoryResponseDto nearestHistory = findNearestHistory(notificationRequest, nearByHistoryList);
+        Optional<NearestHistoryResponseDto> optionalHistory = findNearestHistory(notificationRequest, nearByHistoryList);
+        if (optionalHistory.isEmpty()) {
+            log.info("전송할 알림이 없어 종료되었습니다.");
+            return "전송할 알림이 없습니다.";
+        }
+        NearestHistoryResponseDto nearestHistory = optionalHistory.get();
 
         String fcmToken = readFcmToken(request);
 
@@ -77,13 +83,13 @@ public class NotificationService {
         }
     }
 
-    private NearestHistoryResponseDto findNearestHistory(NotificationRequestDto notificationRequest, List<NearByHistoryResponseDto> nearByHistoryList) {
+    private Optional<NearestHistoryResponseDto> findNearestHistory(NotificationRequestDto notificationRequest, List<NearByHistoryResponseDto> nearByHistoryList) {
         double minDistance = Double.MAX_VALUE;
         NearByHistoryResponseDto nearestHistory = null;
         for (NearByHistoryResponseDto nearByHistory : nearByHistoryList) {
-            //if (!checkSendable(notificationRequest.memberId(), nearByHistory.id())) {
-            //    continue;
-            //}
+            if (!checkSendable(notificationRequest.memberId(), nearByHistory.id())) {
+                continue;
+            }
 
             double distance = calculateDistance(notificationRequest.lat(), notificationRequest.lng(), nearByHistory.lat(), nearByHistory.lng());
 
@@ -93,13 +99,16 @@ public class NotificationService {
             }
         }
 
-        //TODO: nearest null일 때 처리
-        return NearestHistoryResponseDto.builder()
+        if (nearestHistory == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(NearestHistoryResponseDto.builder()
             .historyId(nearestHistory.id())
             .name(nearestHistory.name())
             .category(nearestHistory.category())
             .distance((int) minDistance)
-            .build();
+            .build());
     }
 
     private boolean checkSendable(Long memberId, Long historyId) {
@@ -108,12 +117,12 @@ public class NotificationService {
         if (lastNotification != null && LocalDate.parse(lastNotification).equals(LocalDate.now())) {
             return false;
         }
-
+        
         return true;
     }
 
     private double calculateDistance(double memberLatitude, double memberLongitude, double historyLat, double historyLng) {
-        //TODO: 위경도 유효성 검사
+        checkLocation(memberLatitude, memberLongitude);
 
         //위도와 경도 라디안 변환
         double memberLatRad = Math.toRadians(memberLatitude);
@@ -133,11 +142,22 @@ public class NotificationService {
         return EARTH_RADIUS_M * centralAngle;
     }
 
+    private void checkLocation(Double lat, Double lng) {
+        if (lat == null || lng == null) {
+            throw new BaseException(ErrorCode.INVALID_LOCATION_ERROR);
+        }
+
+        if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+            throw new BaseException(ErrorCode.INVALID_LOCATION_ERROR);
+        }
+    }
+
     private String readFcmToken(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
-            throw new BaseException(ErrorCode.FCM_TOKEN_NOT_FOUND_ERROR);  // 쿠키가 없으면 예외를 던짐
+            throw new BaseException(ErrorCode.FCM_TOKEN_NOT_REGISTERED_ERROR);
         }
+
         return Arrays.stream(cookies)
             .filter(cookie -> "fcmToken".equals(cookie.getName()))
             .findFirst()
@@ -146,13 +166,13 @@ public class NotificationService {
     }
 
     private Message createMessage(NearestHistoryResponseDto nearestHistory, String fcmToken) {
-        String noficiationBody = "아이디 : " + nearestHistory.historyId() + ", 이름 : " + nearestHistory.name() + ", 종류 : " + nearestHistory.category() + ", 거리 : " + nearestHistory.distance();
-        log.info("알림 정보 :{}", noficiationBody);
+        String notificationBody = "아이디 : " + nearestHistory.historyId() + ", 이름 : " + nearestHistory.name() + ", 종류 : " + nearestHistory.category() + ", 거리 : " + nearestHistory.distance();
+        log.debug("알림 정보 :{}", notificationBody);
         return Message.builder()
             .setToken(fcmToken)
             .setNotification(Notification.builder()
                 .setTitle("역사 정보")
-                .setBody(noficiationBody)
+                .setBody(notificationBody)
                 .setImage(null).build())
             .build();
     }
