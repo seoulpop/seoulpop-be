@@ -40,6 +40,5 @@ public class MemberService {
         oauthLogoutService.logout(response, oauthServerType, member.getOauthId().getOauthServerId()); // 카카오 로그아웃
         tokenService.deleteHeader(response); // header에서 accesstoken, refreshtoken 삭제
         member.setDeleted(true);
-        memberRepository.save(member);
     }
 }
