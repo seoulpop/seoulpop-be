@@ -55,6 +55,7 @@ public class NotificationService {
         log.debug("알림 전송 요청 접수, noficationRequest : {}", notificationRequest.toString());
         List<NearByHistoryResponseDto> nearByHistoryList = historyService.readNearByHistoryList(notificationRequest.memberId(),
             notificationRequest.lat(), notificationRequest.lng(), H3_CHECK_LEVEL);
+        log.debug("근처 역사 수 : {}", nearByHistoryList.size());
 
         if (nearByHistoryList.isEmpty()) {
             log.info("전송할 알림이 없어 종료되었습니다.");
@@ -87,9 +88,9 @@ public class NotificationService {
         double minDistance = Double.MAX_VALUE;
         NearByHistoryResponseDto nearestHistory = null;
         for (NearByHistoryResponseDto nearByHistory : nearByHistoryList) {
-            if (!checkSendable(notificationRequest.memberId(), nearByHistory.id())) {
-                continue;
-            }
+            //if (!checkSendable(notificationRequest.memberId(), nearByHistory.id())) {
+            //    continue;
+            //}
 
             double distance = calculateDistance(notificationRequest.lat(), notificationRequest.lng(), nearByHistory.lat(), nearByHistory.lng());
 
@@ -117,7 +118,7 @@ public class NotificationService {
         if (lastNotification != null && LocalDate.parse(lastNotification).equals(LocalDate.now())) {
             return false;
         }
-        
+
         return true;
     }
 
@@ -168,6 +169,7 @@ public class NotificationService {
     private Message createMessage(NearestHistoryResponseDto nearestHistory, String fcmToken) {
         String notificationBody = "아이디 : " + nearestHistory.historyId() + ", 이름 : " + nearestHistory.name() + ", 종류 : " + nearestHistory.category() + ", 거리 : " + nearestHistory.distance();
         log.debug("알림 정보 :{}", notificationBody);
+
         return Message.builder()
             .setToken(fcmToken)
             .setNotification(Notification.builder()
