@@ -32,6 +32,17 @@ spring:
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
 
+  jwt:
+    token:
+      secret-key: ${SECRET_KEY}
+      refresh-secret-key: ${REFRESH_SECRET_KEY}
+
+  oauth:
+    kakao:
+      client_id: ${CLIENT_ID}
+      redirect_uri: ${REDIRECT_URI}
+      scope: profile_nickname
+
   sql:
     init:
       mode: always
