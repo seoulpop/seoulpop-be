@@ -10,6 +10,8 @@ import lombok.Builder;
 public record SiteDto(
     String category,
     Long id,
+    Double lat,
+    Double lng,
     String thumbnail,
     String name,
     String label,
@@ -19,6 +21,7 @@ public record SiteDto(
     String historicAddress,
     String address,
     String reference,
+    String atlasImageUrl,
     List<ImageDto> images
 ) {
 
@@ -26,6 +29,8 @@ public record SiteDto(
         return SiteDto.builder()
             .category(history.getCategory())
             .id(history.getId())
+            .lat(history.getLat())
+            .lng(history.getLng())
             .thumbnail(history.getThumbnail())
             .name(history.getName())
             .label(history.getLabel())
@@ -33,6 +38,7 @@ public record SiteDto(
             .summary(history.getSummary())
             .description(history.getDescription())
             .historicAddress(history.getHistoricAddress())
+            .atlasImageUrl(history.getAtlasImageUrl())
             .address(history.getAddress())
             .reference(history.getReference())
             .images(history.getImages().stream().map(ImageDto::from).toList())
