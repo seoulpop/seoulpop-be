@@ -14,7 +14,9 @@ import com.ssafy.seoulpop.notification.dto.NotificationRequestDto;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.time.LocalDate;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +32,7 @@ import org.springframework.stereotype.Service;
 public class NotificationService {
 
     //check level : 7 ~ 13
+    private static final String LOGO_URL = "https://seoulpop.s3.ap-northeast-2.amazonaws.com/seoulpop_logo.png";
     private static final int H3_CHECK_LEVEL = 9;
     private static final double EARTH_RADIUS_M = 6371000.0;
 
@@ -53,8 +56,10 @@ public class NotificationService {
 
     public String sendNotification(HttpServletRequest request, NotificationRequestDto notificationRequest) {
         log.debug("알림 전송 요청 접수, noficationRequest : {}", notificationRequest.toString());
+
         List<NearByHistoryResponseDto> nearByHistoryList = historyService.readNearByHistoryList(notificationRequest.memberId(),
             notificationRequest.lat(), notificationRequest.lng(), H3_CHECK_LEVEL);
+        log.debug("근처 역사 수 : {}", nearByHistoryList.size());
 
         if (nearByHistoryList.isEmpty()) {
             log.info("전송할 알림이 없어 종료되었습니다.");
@@ -74,7 +79,8 @@ public class NotificationService {
 
         try {
             FirebaseMessaging.getInstance().send(message);
-            redisTemplate.opsForValue().set("notification:" + notificationRequest.memberId() + ":" + nearestHistory.historyId(), String.valueOf(LocalDate.now()));
+            redisTemplate.opsForValue().set("notification:" + notificationRequest.memberId(), String.valueOf(LocalDateTime.now()), Duration.ofHours(24));
+            redisTemplate.opsForValue().set("notification:" + notificationRequest.memberId() + ":" + nearestHistory.historyId(), String.valueOf(LocalDateTime.now()), Duration.ofHours(24));
             log.info("알림이 전송되었습니다.");
             return "알림이 전송되었습니다.";
         } catch (FirebaseMessagingException e) {
@@ -83,13 +89,30 @@ public class NotificationService {
         }
     }
 
+    private boolean checkSendable(long memberId) {
+        LocalTime fromTime = LocalTime.of(21, 0);
+        LocalTime toTime = LocalTime.of(9, 0);
+
+        if (LocalTime.now().isAfter(fromTime) || LocalTime.now().isBefore(toTime)) {
+            return false;
+        }
+
+        String checkKey = "notification:" + memberId;
+        String lastNotification = redisTemplate.opsForValue().get(checkKey);
+        if (lastNotification != null) {
+            return false;
+        }
+
+        return true;
+    }
+
     private Optional<NearestHistoryResponseDto> findNearestHistory(NotificationRequestDto notificationRequest, List<NearByHistoryResponseDto> nearByHistoryList) {
         double minDistance = Double.MAX_VALUE;
         NearByHistoryResponseDto nearestHistory = null;
         for (NearByHistoryResponseDto nearByHistory : nearByHistoryList) {
-            if (!checkSendable(notificationRequest.memberId(), nearByHistory.id())) {
-                continue;
-            }
+            //if (!checkLocalSendable(notificationRequest.memberId(), nearByHistory.id())) {
+            //    continue;
+            //}
 
             double distance = calculateDistance(notificationRequest.lat(), notificationRequest.lng(), nearByHistory.lat(), nearByHistory.lng());
 
@@ -111,13 +134,13 @@ public class NotificationService {
             .build());
     }
 
-    private boolean checkSendable(Long memberId, Long historyId) {
+    private boolean checkLocalSendable(long memberId, long historyId) {
         String checkKey = "notification:" + memberId + ":" + historyId;
         String lastNotification = redisTemplate.opsForValue().get(checkKey);
-        if (lastNotification != null && LocalDate.parse(lastNotification).equals(LocalDate.now())) {
+        if (lastNotification != null) {
             return false;
         }
-        
+
         return true;
     }
 
@@ -166,14 +189,27 @@ public class NotificationService {
     }
 
     private Message createMessage(NearestHistoryResponseDto nearestHistory, String fcmToken) {
-        String notificationBody = "아이디 : " + nearestHistory.historyId() + ", 이름 : " + nearestHistory.name() + ", 종류 : " + nearestHistory.category() + ", 거리 : " + nearestHistory.distance();
-        log.debug("알림 정보 :{}", notificationBody);
+        String notificationInfo = "아이디 : " + nearestHistory.historyId() + ", 이름 : " + nearestHistory.name() + ", 종류 : " + nearestHistory.category() + ", 거리 : " + nearestHistory.distance();
+        log.debug("알림 정보 :{}", notificationInfo);
+
+        StringBuilder messageBody = new StringBuilder(nearestHistory.distance() + "m 떨어진 곳에 ");
+        switch (nearestHistory.category()) {
+            case "3·1운동":
+                messageBody.append("3·1운동의 흔적이 위치해 있습니다.");
+                break;
+            case "6·25전쟁":
+                messageBody.append("6·25전쟁의 흔적이 위치해 있습니다.");
+                break;
+            default:
+                messageBody.append("문화재가 위치해 있습니다.");
+        }
+
         return Message.builder()
             .setToken(fcmToken)
             .setNotification(Notification.builder()
-                .setTitle("역사 정보")
-                .setBody(notificationBody)
-                .setImage(null).build())
+                .setTitle("근처에서 역사적 현장이 발견되었습니다!")
+                .setBody(messageBody.toString())
+                .build())
             .build();
     }
 }
