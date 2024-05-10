@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 public class NotificationService {
 
     //check level : 7 ~ 13
+    private static final String LOGO_URL = "https://seoulpop.s3.ap-northeast-2.amazonaws.com/seoulpop_logo.png";
     private static final int H3_CHECK_LEVEL = 9;
     private static final double EARTH_RADIUS_M = 6371000.0;
 
@@ -167,15 +168,27 @@ public class NotificationService {
     }
 
     private Message createMessage(NearestHistoryResponseDto nearestHistory, String fcmToken) {
-        String notificationBody = "아이디 : " + nearestHistory.historyId() + ", 이름 : " + nearestHistory.name() + ", 종류 : " + nearestHistory.category() + ", 거리 : " + nearestHistory.distance();
-        log.debug("알림 정보 :{}", notificationBody);
+        String notificationInfo = "아이디 : " + nearestHistory.historyId() + ", 이름 : " + nearestHistory.name() + ", 종류 : " + nearestHistory.category() + ", 거리 : " + nearestHistory.distance();
+        log.debug("알림 정보 :{}", notificationInfo);
+
+        StringBuilder messageBody = new StringBuilder(nearestHistory.distance() + "m 떨어진 곳에 ");
+        switch (nearestHistory.category()) {
+            case "3·1운동":
+                messageBody.append("3·1운동의 흔적이 위치해 있습니다.");
+                break;
+            case "6·25전쟁":
+                messageBody.append("6·25전쟁의 흔적이 위치해 있습니다.");
+                break;
+            default:
+                messageBody.append("문화재가 위치해 있습니다.");
+        }
 
         return Message.builder()
             .setToken(fcmToken)
             .setNotification(Notification.builder()
-                .setTitle("역사 정보")
-                .setBody(notificationBody)
-                .setImage(null).build())
+                .setTitle("근처에서 역사적 현장이 발견되었습니다!")
+                .setBody(nearestHistory.distance() + "m 떨어진 곳에 " + messageBody)
+                .setImage(LOGO_URL).build())
             .build();
     }
 }
