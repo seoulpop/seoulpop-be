@@ -14,7 +14,9 @@ import com.ssafy.seoulpop.notification.dto.NotificationRequestDto;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.time.LocalDate;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -54,6 +56,7 @@ public class NotificationService {
 
     public String sendNotification(HttpServletRequest request, NotificationRequestDto notificationRequest) {
         log.debug("알림 전송 요청 접수, noficationRequest : {}", notificationRequest.toString());
+
         List<NearByHistoryResponseDto> nearByHistoryList = historyService.readNearByHistoryList(notificationRequest.memberId(),
             notificationRequest.lat(), notificationRequest.lng(), H3_CHECK_LEVEL);
         log.debug("근처 역사 수 : {}", nearByHistoryList.size());
@@ -76,7 +79,8 @@ public class NotificationService {
 
         try {
             FirebaseMessaging.getInstance().send(message);
-            redisTemplate.opsForValue().set("notification:" + notificationRequest.memberId() + ":" + nearestHistory.historyId(), String.valueOf(LocalDate.now()));
+            redisTemplate.opsForValue().set("notification:" + notificationRequest.memberId(), String.valueOf(LocalDateTime.now()), Duration.ofHours(24));
+            redisTemplate.opsForValue().set("notification:" + notificationRequest.memberId() + ":" + nearestHistory.historyId(), String.valueOf(LocalDateTime.now()), Duration.ofHours(24));
             log.info("알림이 전송되었습니다.");
             return "알림이 전송되었습니다.";
         } catch (FirebaseMessagingException e) {
@@ -85,11 +89,28 @@ public class NotificationService {
         }
     }
 
+    private boolean checkSendable(long memberId) {
+        LocalTime fromTime = LocalTime.of(21, 0);
+        LocalTime toTime = LocalTime.of(9, 0);
+
+        if (LocalTime.now().isAfter(fromTime) || LocalTime.now().isBefore(toTime)) {
+            return false;
+        }
+
+        String checkKey = "notification:" + memberId;
+        String lastNotification = redisTemplate.opsForValue().get(checkKey);
+        if (lastNotification != null) {
+            return false;
+        }
+
+        return true;
+    }
+
     private Optional<NearestHistoryResponseDto> findNearestHistory(NotificationRequestDto notificationRequest, List<NearByHistoryResponseDto> nearByHistoryList) {
         double minDistance = Double.MAX_VALUE;
         NearByHistoryResponseDto nearestHistory = null;
         for (NearByHistoryResponseDto nearByHistory : nearByHistoryList) {
-            //if (!checkSendable(notificationRequest.memberId(), nearByHistory.id())) {
+            //if (!checkLocalSendable(notificationRequest.memberId(), nearByHistory.id())) {
             //    continue;
             //}
 
@@ -113,10 +134,10 @@ public class NotificationService {
             .build());
     }
 
-    private boolean checkSendable(Long memberId, Long historyId) {
+    private boolean checkLocalSendable(long memberId, long historyId) {
         String checkKey = "notification:" + memberId + ":" + historyId;
         String lastNotification = redisTemplate.opsForValue().get(checkKey);
-        if (lastNotification != null && LocalDate.parse(lastNotification).equals(LocalDate.now())) {
+        if (lastNotification != null) {
             return false;
         }
 
@@ -187,8 +208,8 @@ public class NotificationService {
             .setToken(fcmToken)
             .setNotification(Notification.builder()
                 .setTitle("근처에서 역사적 현장이 발견되었습니다!")
-                .setBody(nearestHistory.distance() + "m 떨어진 곳에 " + messageBody)
-                .setImage(LOGO_URL).build())
+                .setBody(messageBody.toString())
+                .build())
             .build();
     }
 }
