@@ -4,6 +4,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
+import com.google.gson.Gson;
 import com.ssafy.seoulpop.exception.BaseException;
 import com.ssafy.seoulpop.exception.ErrorCode;
 import com.ssafy.seoulpop.history.dto.NearByHistoryResponseDto;
@@ -78,15 +79,22 @@ public class NotificationService {
         Message message = createMessage(nearestHistory, fcmToken);
 
         try {
-            FirebaseMessaging.getInstance().send(message);
-            redisTemplate.opsForValue().set("notification:" + notificationRequest.memberId(), String.valueOf(LocalDateTime.now()), Duration.ofHours(24));
-            redisTemplate.opsForValue().set("notification:" + notificationRequest.memberId() + ":" + nearestHistory.historyId(), String.valueOf(LocalDateTime.now()), Duration.ofHours(24));
+            String response = FirebaseMessaging.getInstance().send(message);
+            log.debug("123123123123{}", response);
+            saveMessageInfo(notificationRequest.memberId(), nearestHistory.historyId(), response, message);
             log.info("알림이 전송되었습니다.");
             return "알림이 전송되었습니다.";
         } catch (FirebaseMessagingException e) {
             e.printStackTrace();
             return "알림을 전송할 수 없습니다.";
         }
+    }
+
+    public String readNotificationInfo(String notificationId) {
+        String redisKey = "notification:" + notificationId;
+        String notificationInfo = redisTemplate.opsForValue().get(redisKey);
+//        redisTemplate.delete(redisKey);
+        return notificationInfo;
     }
 
     private boolean checkSendable(long memberId) {
@@ -130,6 +138,8 @@ public class NotificationService {
             .historyId(nearestHistory.id())
             .name(nearestHistory.name())
             .category(nearestHistory.category())
+            .lat(nearestHistory.lat())
+            .lng(nearestHistory.lng())
             .distance((int) minDistance)
             .build());
     }
@@ -165,11 +175,7 @@ public class NotificationService {
         return EARTH_RADIUS_M * centralAngle;
     }
 
-    private void checkLocation(Double lat, Double lng) {
-        if (lat == null || lng == null) {
-            throw new BaseException(ErrorCode.INVALID_LOCATION_ERROR);
-        }
-
+    private void checkLocation(double lat, double lng) {
         if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
             throw new BaseException(ErrorCode.INVALID_LOCATION_ERROR);
         }
@@ -205,11 +211,27 @@ public class NotificationService {
         }
 
         return Message.builder()
-            .setToken(fcmToken)
-            .setNotification(Notification.builder()
-                .setTitle("근처에서 역사적 현장이 발견되었습니다!")
-                .setBody(messageBody.toString())
-                .build())
-            .build();
+                .setToken(fcmToken)
+                .setNotification(Notification.builder()
+                        .setTitle("근처에서 역사적 현장이 발견되었습니다!")
+                        .setBody(messageBody.toString())
+                        .build())
+                .putData("historyId", String.valueOf(nearestHistory.historyId()))
+                .putData("historyLat", String.valueOf(nearestHistory.lat()))
+                .putData("historyLng", String.valueOf(nearestHistory.lng()))
+                .build();
+    }
+
+    private void saveMessageInfo(long memberId, long historyId, String response, Message message) {
+        //사용자별 하루 한 번 전송을 위한 저장
+        redisTemplate.opsForValue().set("notification:" + memberId, String.valueOf(LocalDateTime.now()), Duration.ofHours(24));
+
+        //장소별 하루 한 번 전송을 위한 저장
+        redisTemplate.opsForValue().set("notification:" + memberId + ":" + historyId, String.valueOf(LocalDateTime.now()), Duration.ofHours(24));
+
+        //Message 정보 전달을 위한 저장
+        Gson gson = new Gson();
+        String messageId = response.split("messages/")[1];
+        redisTemplate.opsForValue().set("notification:" + messageId, gson.toJson(message));
     }
 }
