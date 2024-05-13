@@ -4,7 +4,6 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
-import com.google.gson.Gson;
 import com.ssafy.seoulpop.exception.BaseException;
 import com.ssafy.seoulpop.exception.ErrorCode;
 import com.ssafy.seoulpop.history.dto.NearByHistoryResponseDto;
@@ -33,7 +32,6 @@ import org.springframework.stereotype.Service;
 public class NotificationService {
 
     //check level : 7 ~ 13
-    private static final String LOGO_URL = "https://seoulpop.s3.ap-northeast-2.amazonaws.com/seoulpop_logo.png";
     private static final int H3_CHECK_LEVEL = 9;
     private static final double EARTH_RADIUS_M = 6371000.0;
 
@@ -58,6 +56,10 @@ public class NotificationService {
     public String sendNotification(HttpServletRequest request, NotificationRequestDto notificationRequest) {
         log.debug("알림 전송 요청 접수, noficationRequest : {}", notificationRequest.toString());
 
+        if (!checkSendable(notificationRequest.memberId())) {
+            return "알림 전송이 불가능합니다.";
+        }
+
         List<NearByHistoryResponseDto> nearByHistoryList = historyService.readNearByHistoryList(notificationRequest.memberId(),
             notificationRequest.lat(), notificationRequest.lng(), H3_CHECK_LEVEL);
         log.debug("근처 역사 수 : {}", nearByHistoryList.size());
@@ -80,7 +82,6 @@ public class NotificationService {
 
         try {
             String response = FirebaseMessaging.getInstance().send(message);
-            log.debug("123123123123{}", response);
             saveMessageInfo(notificationRequest.memberId(), nearestHistory.historyId(), response, message);
             log.info("알림이 전송되었습니다.");
             return "알림이 전송되었습니다.";
@@ -88,13 +89,6 @@ public class NotificationService {
             e.printStackTrace();
             return "알림을 전송할 수 없습니다.";
         }
-    }
-
-    public String readNotificationInfo(String notificationId) {
-        String redisKey = "notification:" + notificationId;
-        String notificationInfo = redisTemplate.opsForValue().get(redisKey);
-//        redisTemplate.delete(redisKey);
-        return notificationInfo;
     }
 
     private boolean checkSendable(long memberId) {
@@ -118,9 +112,9 @@ public class NotificationService {
         double minDistance = Double.MAX_VALUE;
         NearByHistoryResponseDto nearestHistory = null;
         for (NearByHistoryResponseDto nearByHistory : nearByHistoryList) {
-            //if (!checkLocalSendable(notificationRequest.memberId(), nearByHistory.id())) {
-            //    continue;
-            //}
+            if (!checkLocalSendable(notificationRequest.memberId(), nearByHistory.id())) {
+                continue;
+            }
 
             double distance = calculateDistance(notificationRequest.lat(), notificationRequest.lng(), nearByHistory.lat(), nearByHistory.lng());
 
@@ -211,15 +205,15 @@ public class NotificationService {
         }
 
         return Message.builder()
-                .setToken(fcmToken)
-                .setNotification(Notification.builder()
-                        .setTitle("근처에서 역사적 현장이 발견되었습니다!")
-                        .setBody(messageBody.toString())
-                        .build())
-                .putData("historyId", String.valueOf(nearestHistory.historyId()))
-                .putData("historyLat", String.valueOf(nearestHistory.lat()))
-                .putData("historyLng", String.valueOf(nearestHistory.lng()))
-                .build();
+            .setToken(fcmToken)
+            .setNotification(Notification.builder()
+                .setTitle("근처에서 역사적 현장이 발견되었습니다!")
+                .setBody(messageBody.toString())
+                .build())
+            .putData("historyId", String.valueOf(nearestHistory.historyId()))
+            .putData("historyLat", String.valueOf(nearestHistory.lat()))
+            .putData("historyLng", String.valueOf(nearestHistory.lng()))
+            .build();
     }
 
     private void saveMessageInfo(long memberId, long historyId, String response, Message message) {
@@ -228,10 +222,5 @@ public class NotificationService {
 
         //장소별 하루 한 번 전송을 위한 저장
         redisTemplate.opsForValue().set("notification:" + memberId + ":" + historyId, String.valueOf(LocalDateTime.now()), Duration.ofHours(24));
-
-        //Message 정보 전달을 위한 저장
-        Gson gson = new Gson();
-        String messageId = response.split("messages/")[1];
-        redisTemplate.opsForValue().set("notification:" + messageId, gson.toJson(message));
     }
 }
