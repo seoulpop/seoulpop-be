@@ -37,7 +37,9 @@ public class SecurityConfig {
                     "/ping",
                     // allow swagger url
                     "/swagger-ui",
-                    "/swagger-ui/**"
+                    "/swagger-ui/**",
+                    "/v3/**",
+                    "/v1/**" // 임시
                 )
                 .permitAll()
                 .anyRequest()
