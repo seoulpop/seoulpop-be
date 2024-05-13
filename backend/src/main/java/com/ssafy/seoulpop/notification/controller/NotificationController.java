@@ -9,7 +9,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "푸시알림 컨트롤러", description = "FCM토큰 쿠키 발급, 주변 역사 정보 알림 전송 기능이 포함되어 있음")
 @RestController
@@ -35,14 +38,5 @@ public class NotificationController {
     @PostMapping
     public ResponseEntity<String> getNotification(HttpServletRequest request, @RequestBody NotificationRequestDto requestDto) {
         return ResponseEntity.ok(notificationService.sendNotification(request, requestDto));
-    }
-
-    @Operation(
-            summary = "알림 내용 조회",
-            description = "사용자가 선택한 푸시 알림 내용 반환"
-    )
-    @GetMapping("/{notificationId}")
-    public ResponseEntity<String> getNotificationInfo(@PathVariable String notificationId) {
-        return ResponseEntity.ok(notificationService.readNotificationInfo(notificationId));
     }
 }
