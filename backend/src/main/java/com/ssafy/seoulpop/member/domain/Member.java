@@ -34,6 +34,9 @@ public class Member extends BaseEntity {
     private OauthId oauthId;
 
     @NonNull
+    private String name;
+
+    @NonNull
     @Builder.Default
     private Boolean deleted = false;
 

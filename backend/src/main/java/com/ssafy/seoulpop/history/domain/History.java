@@ -9,7 +9,7 @@ import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -65,7 +65,7 @@ public class History extends BaseEntity {
     private String reference; // SiteDto
 
     @Column(columnDefinition = "datetime(0) default now(0)")
-    private LocalDateTime registeredAt; // HeritageDto
+    private LocalDate registeredAt; // HeritageDto
 
     @Column(columnDefinition = "MEDIUMTEXT")
     private String additionalInfo; //HeritageDto
