@@ -2,14 +2,17 @@ package com.ssafy.seoulpop.notification.controller;
 
 import com.ssafy.seoulpop.notification.dto.CookieRequestDto;
 import com.ssafy.seoulpop.notification.dto.NotificationRequestDto;
+import com.ssafy.seoulpop.notification.dto.NotificationResponseDto;
 import com.ssafy.seoulpop.notification.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,8 +23,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("v1/notifications")
 @RequiredArgsConstructor
 public class NotificationController {
+    //TODO: Member 연동
 
-    private final NotificationService fcmService;
+    private final NotificationService notificationService;
 
     @Operation(
         summary = "쿠키 발급",
@@ -29,7 +33,7 @@ public class NotificationController {
     )
     @PostMapping("/regist")
     public ResponseEntity<String> getCookie(HttpServletResponse response, @RequestBody CookieRequestDto requestDto) {
-        return ResponseEntity.ok(fcmService.createCookie(response, requestDto));
+        return ResponseEntity.ok(notificationService.createCookie(response, requestDto));
     }
 
     @Operation(
@@ -38,6 +42,15 @@ public class NotificationController {
     )
     @PostMapping
     public ResponseEntity<String> getNotification(HttpServletRequest request, @RequestBody NotificationRequestDto requestDto) throws IOException {
-        return ResponseEntity.ok(fcmService.sendNotification(request, requestDto));
+        return ResponseEntity.ok(notificationService.sendNotification(request, requestDto));
+    }
+
+    @Operation(
+        summary = "전체 알림 내역 조회",
+        description = "사용자별 알림 내역 조회, List로 반환"
+    )
+    @GetMapping
+    public ResponseEntity<List<NotificationResponseDto>> getNotificationList(HttpServletRequest request) {
+        return ResponseEntity.ok(notificationService.readNotificationList(-100));
     }
 }

@@ -20,6 +20,7 @@ import com.ssafy.seoulpop.notification.dto.FcmRequestDto;
 import com.ssafy.seoulpop.notification.dto.FcmRequestDto.Data;
 import com.ssafy.seoulpop.notification.dto.NearestHistoryResponseDto;
 import com.ssafy.seoulpop.notification.dto.NotificationRequestDto;
+import com.ssafy.seoulpop.notification.dto.NotificationResponseDto;
 import com.ssafy.seoulpop.notification.repository.NotificationRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,6 +31,7 @@ import java.io.InputStream;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +45,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
+    //TODO: Member 연동
 
     //check level : 7 ~ 13
     private static final int H3_CHECK_LEVEL = 9;
@@ -101,6 +104,28 @@ public class NotificationService {
 
         log.info("알림이 전송되었습니다.");
         return "알림이 전송되었습니다.";
+    }
+
+    public List<NotificationResponseDto> readNotificationList(long memberId) {
+        List<PushNotification> findNotificationList = notificationRepository.findAllByMember_Id(memberId);
+
+        List<NotificationResponseDto> resultList = new ArrayList<>();
+        for (PushNotification notification : findNotificationList) {
+            resultList.add(
+                NotificationResponseDto.builder()
+                    .notificationId(notification.getId())
+                    .body(notification.getBody())
+                    .title(notification.getTitle())
+                    .historyId(notification.getHistory().getId())
+                    .historyName(notification.getHistory().getName())
+                    .historyCategory(notification.getHistory().getCategory())
+                    .historyLat(notification.getHistory().getLat())
+                    .historyLng(notification.getHistory().getLng())
+                    .build()
+            );
+        }
+
+        return resultList;
     }
 
     private boolean checkSendable(long memberId) {
