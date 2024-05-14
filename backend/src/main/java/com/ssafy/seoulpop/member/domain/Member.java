@@ -2,7 +2,7 @@ package com.ssafy.seoulpop.member.domain;
 
 import com.ssafy.seoulpop.atlas.domain.Atlas;
 import com.ssafy.seoulpop.common.BaseEntity;
-import com.ssafy.seoulpop.fcm.domain.PushNotification;
+import com.ssafy.seoulpop.notification.domain.PushNotification;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
