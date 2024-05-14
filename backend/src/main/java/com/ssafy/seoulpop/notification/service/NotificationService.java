@@ -75,9 +75,9 @@ public class NotificationService {
     }
 
     public String sendNotification(HttpServletRequest request, NotificationRequestDto notificationRequest) throws IOException {
-        if (!checkSendable(notificationRequest.memberId())) {
-            return "알림 전송이 불가능합니다.";
-        }
+//        if (!checkSendable(notificationRequest.memberId())) {
+//            return "알림 전송이 불가능합니다.";
+//        }
 
         List<NearByHistoryResponseDto> nearByHistoryList = historyService.readNearByHistoryList(notificationRequest.memberId(),
             notificationRequest.lat(), notificationRequest.lng(), H3_CHECK_LEVEL);
@@ -122,6 +122,7 @@ public class NotificationService {
                     .historyCategory(notification.getHistory().getCategory())
                     .historyLat(notification.getHistory().getLat())
                     .historyLng(notification.getHistory().getLng())
+                    .checked(notification.getChecked())
                     .build()
             );
         }
@@ -131,8 +132,11 @@ public class NotificationService {
 
     public String updateNotification(UpdateRequestDto requestDto) {
         PushNotification findNotification = notificationRepository.findById(requestDto.notificationId()).orElseThrow(() -> new BaseException(ErrorCode.NOTIFICATION_NOT_FOUND_ERROR));
-        findNotification.updateChecked();
-        notificationRepository.save(findNotification);
+        if (!findNotification.getChecked()) {
+            findNotification.updateChecked();
+            notificationRepository.save(findNotification);
+        }
+        
         return "알림 확인 여부가 업데이트되었습니다.";
     }
 
@@ -297,6 +301,7 @@ public class NotificationService {
                 .history(findHistory)
                 .body(requestDto.message().notification().body())
                 .title(requestDto.message().notification().title())
+                .checked(false)
                 .build()
         );
     }
