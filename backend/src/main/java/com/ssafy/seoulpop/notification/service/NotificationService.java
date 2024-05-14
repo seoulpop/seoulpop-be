@@ -37,9 +37,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
@@ -56,7 +57,7 @@ public class NotificationService {
 
     private final FcmApiClient fcmApiClient;
     private final ServiceAccountKey serviceAccountKey;
-    private final StringRedisTemplate redisTemplate;
+    private final RedisTemplate<String, Object> fcmRedisTemplate;
     private final HistoryService historyService;
     private final HistoryRepository historyRepository;
     private final MemberRepository memberRepository;
@@ -151,7 +152,7 @@ public class NotificationService {
         }
 
         String checkKey = "notification:" + memberId;
-        String lastNotification = redisTemplate.opsForValue().get(checkKey);
+        String lastNotification = (String) fcmRedisTemplate.opsForValue().get(checkKey);
         if (lastNotification != null) {
             return false;
         }
@@ -191,7 +192,7 @@ public class NotificationService {
 
     private boolean checkLocalSendable(long memberId, long historyId) {
         String checkKey = "notification:" + memberId + ":" + historyId;
-        String lastNotification = redisTemplate.opsForValue().get(checkKey);
+        String lastNotification = (String) fcmRedisTemplate.opsForValue().get(checkKey);
         if (lastNotification != null) {
             return false;
         }
@@ -256,6 +257,7 @@ public class NotificationService {
             .message(FcmRequestDto.Message.builder()
                 .token(fcmToken)
                 .data(Data.builder()
+                    .notificationId(UUID.randomUUID().toString())
                     .historyId(String.valueOf(nearestHistory.historyId()))
                     .historyName(nearestHistory.name())
                     .historyCategory(nearestHistory.category())
@@ -288,10 +290,10 @@ public class NotificationService {
 
     private void saveMessageInfo(long memberId, long historyId, FcmRequestDto requestDto) {
         //사용자별 하루 한 번 전송을 위한 저장
-        redisTemplate.opsForValue().set("notification:" + memberId, String.valueOf(LocalDateTime.now()), Duration.ofHours(24));
+        fcmRedisTemplate.opsForValue().set("notification:" + memberId, String.valueOf(LocalDateTime.now()), Duration.ofHours(24));
 
         //장소별 하루 한 번 전송을 위한 저장
-        redisTemplate.opsForValue().set("notification:" + memberId + ":" + historyId, String.valueOf(LocalDateTime.now()), Duration.ofHours(24));
+        fcmRedisTemplate.opsForValue().set("notification:" + memberId + ":" + historyId, String.valueOf(LocalDateTime.now()), Duration.ofHours(24));
 
         //알림 내용 저장
         Member findMember = memberRepository.findById(memberId).orElseThrow(() -> new BaseException(ErrorCode.MEMBER_NOT_FOUND_ERROR));
@@ -299,6 +301,7 @@ public class NotificationService {
 
         notificationRepository.save(
             PushNotification.builder()
+                .id(requestDto.message().data().notificationId())
                 .member(findMember)
                 .history(findHistory)
                 .body(requestDto.message().notification().body())
