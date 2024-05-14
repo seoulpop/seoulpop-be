@@ -163,9 +163,9 @@ public class NotificationService {
         double minDistance = Double.MAX_VALUE;
         NearByHistoryResponseDto nearestHistory = null;
         for (NearByHistoryResponseDto nearByHistory : nearByHistoryList) {
-            if (!checkLocalSendable(notificationRequest.memberId(), nearByHistory.id())) {
-                continue;
-            }
+            //if (!checkLocalSendable(notificationRequest.memberId(), nearByHistory.id())) {
+            //    continue;
+            //}
 
             double distance = calculateDistance(notificationRequest.lat(), notificationRequest.lng(), nearByHistory.lat(), nearByHistory.lng());
 
