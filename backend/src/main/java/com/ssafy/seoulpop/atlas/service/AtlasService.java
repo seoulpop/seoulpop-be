@@ -9,6 +9,7 @@ import com.ssafy.seoulpop.history.domain.History;
 import com.ssafy.seoulpop.history.repository.HistoryRepository;
 import com.ssafy.seoulpop.member.domain.Member;
 import com.ssafy.seoulpop.member.repository.MemberRepository;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -26,11 +27,12 @@ public class AtlasService {
         return atlasRepository.findAtlasInfoByMemberId(memberId);
     }
 
+    @Transactional
     public void createAtlas(Long memberId, Long historyId) {
         Member findMember = memberRepository.findById(memberId).orElseThrow(() -> new BaseException(ErrorCode.MEMBER_NOT_FOUND_ERROR));
         History findHistory = historyRepository.findById(historyId).orElseThrow(() -> new BaseException(ErrorCode.HISTORY_NOT_FOUND_ERROR));
 
-        Optional<Atlas> findAtlas = atlasRepository.findByMember_IdAndHistory_Id(memberId, historyId);
+        Optional<Atlas> findAtlas = atlasRepository.findByMemberIdAndHistoryId(memberId, historyId);
 
         if (findAtlas.isEmpty()) {
             atlasRepository.save(Atlas.builder()
@@ -42,6 +44,5 @@ public class AtlasService {
 
         Atlas atlas = findAtlas.get();
         atlas.updateVisitCnt();
-        atlasRepository.save(atlas);
     }
 }

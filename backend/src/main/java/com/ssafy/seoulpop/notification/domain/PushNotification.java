@@ -1,4 +1,4 @@
-package com.ssafy.seoulpop.atlas.domain;
+package com.ssafy.seoulpop.notification.domain;
 
 import com.ssafy.seoulpop.common.BaseEntity;
 import com.ssafy.seoulpop.history.domain.History;
@@ -19,7 +19,7 @@ import org.hibernate.annotations.ColumnDefault;
 @AllArgsConstructor
 @Builder
 @Entity
-public class Atlas extends BaseEntity {
+public class PushNotification extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -30,10 +30,16 @@ public class Atlas extends BaseEntity {
     private History history;
 
     @NonNull
-    @ColumnDefault("1")
-    private Integer visitCnt;
+    private String title;
 
-    public void updateVisitCnt() {
-        this.visitCnt++;
+    @NonNull
+    private String body;
+
+    @NonNull
+    @ColumnDefault("false")
+    private Boolean checked;
+
+    public void updateChecked() {
+        this.checked = !this.checked;
     }
 }

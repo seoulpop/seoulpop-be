@@ -1,6 +1,7 @@
 package com.ssafy.seoulpop.config;
 
 import com.ssafy.seoulpop.member.domain.client.KakaoApiClient;
+import com.ssafy.seoulpop.notification.domain.client.FcmApiClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -14,6 +15,11 @@ public class HttpInterfaceConfig {
     @Bean
     public KakaoApiClient kakaoApiClient() {
         return createHttpInterface(KakaoApiClient.class);
+    }
+
+    @Bean
+    public FcmApiClient fcmApiClient() {
+        return createHttpInterface(FcmApiClient.class);
     }
 
     private <T> T createHttpInterface(Class<T> c) {

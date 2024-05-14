@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AtlasRepository extends JpaRepository<Atlas, Long>, AtlasRepositoryCustom {
 
-    Optional<Atlas> findByMember_IdAndHistory_Id(Long memberId, Long historyId);
+    Optional<Atlas> findByMemberIdAndHistoryId(Long memberId, Long historyId);
 }
