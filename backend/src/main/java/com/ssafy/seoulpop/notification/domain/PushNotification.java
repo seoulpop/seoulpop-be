@@ -1,10 +1,10 @@
 package com.ssafy.seoulpop.notification.domain;
 
-import com.ssafy.seoulpop.common.BaseEntity;
 import com.ssafy.seoulpop.history.domain.History;
 import com.ssafy.seoulpop.member.domain.Member;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
@@ -19,7 +19,10 @@ import org.hibernate.annotations.ColumnDefault;
 @AllArgsConstructor
 @Builder
 @Entity
-public class PushNotification extends BaseEntity {
+public class PushNotification {
+
+    @Id
+    private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -34,7 +37,7 @@ public class PushNotification extends BaseEntity {
 
     @NonNull
     private String body;
-
+    
     @NonNull
     @ColumnDefault("false")
     private Boolean checked;
