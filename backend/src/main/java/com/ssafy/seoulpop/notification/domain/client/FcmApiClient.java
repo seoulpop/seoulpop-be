@@ -1,4 +1,4 @@
-package com.ssafy.seoulpop.fcm.domain.client;
+package com.ssafy.seoulpop.notification.domain.client;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 

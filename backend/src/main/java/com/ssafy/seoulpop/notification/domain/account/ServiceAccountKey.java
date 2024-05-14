@@ -1,4 +1,4 @@
-package com.ssafy.seoulpop.fcm.domain.account;
+package com.ssafy.seoulpop.notification.domain.account;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

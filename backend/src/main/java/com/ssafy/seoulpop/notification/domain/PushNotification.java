@@ -1,4 +1,4 @@
-package com.ssafy.seoulpop.fcm.domain;
+package com.ssafy.seoulpop.notification.domain;
 
 import com.ssafy.seoulpop.common.BaseEntity;
 import com.ssafy.seoulpop.history.domain.History;

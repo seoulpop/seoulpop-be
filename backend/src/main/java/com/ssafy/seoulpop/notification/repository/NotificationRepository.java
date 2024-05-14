@@ -1,6 +1,6 @@
-package com.ssafy.seoulpop.fcm.repository;
+package com.ssafy.seoulpop.notification.repository;
 
-import com.ssafy.seoulpop.fcm.domain.PushNotification;
+import com.ssafy.seoulpop.notification.domain.PushNotification;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 

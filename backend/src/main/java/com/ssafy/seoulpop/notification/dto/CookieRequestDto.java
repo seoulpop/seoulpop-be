@@ -1,4 +1,4 @@
-package com.ssafy.seoulpop.fcm.dto;
+package com.ssafy.seoulpop.notification.dto;
 
 public record CookieRequestDto(
     String fcmToken
