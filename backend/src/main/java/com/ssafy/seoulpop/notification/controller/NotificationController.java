@@ -1,12 +1,13 @@
 package com.ssafy.seoulpop.notification.controller;
 
-import com.ssafy.seoulpop.notification.dto.FcmCookieRequestDto;
+import com.ssafy.seoulpop.notification.dto.CookieRequestDto;
 import com.ssafy.seoulpop.notification.dto.NotificationRequestDto;
 import com.ssafy.seoulpop.notification.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,15 +21,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class NotificationController {
 
-    private final NotificationService notificationService;
+    private final NotificationService fcmService;
 
     @Operation(
         summary = "쿠키 발급",
         description = "fcmToken 이름으로 쿠키 발급"
     )
     @PostMapping("/regist")
-    public ResponseEntity<String> getCookie(HttpServletResponse response, @RequestBody FcmCookieRequestDto requestDto) {
-        return ResponseEntity.ok(notificationService.createCookie(response, requestDto));
+    public ResponseEntity<String> getCookie(HttpServletResponse response, @RequestBody CookieRequestDto requestDto) {
+        return ResponseEntity.ok(fcmService.createCookie(response, requestDto));
     }
 
     @Operation(
@@ -36,7 +37,7 @@ public class NotificationController {
         description = "사용자 위치 기반 알림 확인, 가장 가까운 역사 알림 생성"
     )
     @PostMapping
-    public ResponseEntity<String> getNotification(HttpServletRequest request, @RequestBody NotificationRequestDto requestDto) {
-        return ResponseEntity.ok(notificationService.sendNotification(request, requestDto));
+    public ResponseEntity<String> getNotification(HttpServletRequest request, @RequestBody NotificationRequestDto requestDto) throws IOException {
+        return ResponseEntity.ok(fcmService.sendNotification(request, requestDto));
     }
 }
