@@ -18,6 +18,7 @@ public record FcmRequestDto(
 
     @Builder
     public record Data(
+        String notificationId,
         String historyId,
         String historyName,
         String historyCategory,
