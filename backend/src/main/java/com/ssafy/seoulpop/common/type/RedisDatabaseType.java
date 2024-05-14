@@ -7,5 +7,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum RedisDatabaseType {
     TOKEN_DB_IDX,
-    BLACKLIST_TOKEN_IDX
+    BLACKLIST_TOKEN_IDX,
+    FCM_IDX
 }

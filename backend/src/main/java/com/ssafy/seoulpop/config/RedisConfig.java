@@ -1,5 +1,8 @@
 package com.ssafy.seoulpop.config;
 
+import static com.ssafy.seoulpop.common.type.RedisDatabaseType.FCM_IDX;
+import static com.ssafy.seoulpop.common.type.RedisDatabaseType.TOKEN_DB_IDX;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,11 +26,6 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private int port;
 
-    @Bean
-    public LettuceConnectionFactory redisConnectionFactory() {
-        return createLettuceConnectionFactory(0);
-    }
-
     private LettuceConnectionFactory createLettuceConnectionFactory(int database) {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
         redisStandaloneConfiguration.setHostName(host);
@@ -44,7 +42,18 @@ public class RedisConfig {
     @Bean
     public RedisTemplate<String, Object> tokenRedisTemplate() {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(redisConnectionFactory());
+        template.setConnectionFactory(createLettuceConnectionFactory(TOKEN_DB_IDX.ordinal()));
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new GenericToStringSerializer<>(Object.class));
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(new GenericToStringSerializer<>(Object.class));
+        return template;
+    }
+
+    @Bean
+    public RedisTemplate<String, Object> fcmRedisTemplate() {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(createLettuceConnectionFactory(FCM_IDX.ordinal()));
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new GenericToStringSerializer<>(Object.class));
         template.setHashKeySerializer(new StringRedisSerializer());
