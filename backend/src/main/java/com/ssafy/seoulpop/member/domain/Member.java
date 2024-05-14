@@ -2,6 +2,7 @@ package com.ssafy.seoulpop.member.domain;
 
 import com.ssafy.seoulpop.atlas.domain.Atlas;
 import com.ssafy.seoulpop.common.BaseEntity;
+import com.ssafy.seoulpop.fcm.domain.PushNotification;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -43,4 +44,8 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Atlas> atlases = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<PushNotification> notifications = new ArrayList<>();
 }

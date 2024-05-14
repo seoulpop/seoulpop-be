@@ -2,6 +2,7 @@ package com.ssafy.seoulpop.history.domain;
 
 import com.ssafy.seoulpop.atlas.domain.Atlas;
 import com.ssafy.seoulpop.common.BaseEntity;
+import com.ssafy.seoulpop.fcm.domain.PushNotification;
 import com.ssafy.seoulpop.image.domain.Image;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -85,4 +86,8 @@ public class History extends BaseEntity {
     @OneToMany(mappedBy = "history", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Image> images = new ArrayList<>();
+
+    @OneToMany(mappedBy = "history", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<PushNotification> notifications = new ArrayList<>();
 }
