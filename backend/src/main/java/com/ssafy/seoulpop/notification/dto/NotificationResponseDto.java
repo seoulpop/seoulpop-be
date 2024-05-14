@@ -11,7 +11,8 @@ public record NotificationResponseDto(
     Double historyLat,
     Double historyLng,
     String title,
-    String body
+    String body,
+    Boolean checked
 ) {
 
 }
