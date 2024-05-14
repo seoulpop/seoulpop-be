@@ -3,6 +3,7 @@ package com.ssafy.seoulpop.notification.controller;
 import com.ssafy.seoulpop.notification.dto.CookieRequestDto;
 import com.ssafy.seoulpop.notification.dto.NotificationRequestDto;
 import com.ssafy.seoulpop.notification.dto.NotificationResponseDto;
+import com.ssafy.seoulpop.notification.dto.UpdateRequestDto;
 import com.ssafy.seoulpop.notification.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,6 +14,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,5 +54,10 @@ public class NotificationController {
     @GetMapping
     public ResponseEntity<List<NotificationResponseDto>> getNotificationList(HttpServletRequest request) {
         return ResponseEntity.ok(notificationService.readNotificationList(-100));
+    }
+
+    @PatchMapping
+    public ResponseEntity<String> editNotification(@RequestBody UpdateRequestDto requestDto) {
+        return ResponseEntity.ok(notificationService.updateNotification(requestDto));
     }
 }

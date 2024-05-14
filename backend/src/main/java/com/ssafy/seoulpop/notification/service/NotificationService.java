@@ -21,6 +21,7 @@ import com.ssafy.seoulpop.notification.dto.FcmRequestDto.Data;
 import com.ssafy.seoulpop.notification.dto.NearestHistoryResponseDto;
 import com.ssafy.seoulpop.notification.dto.NotificationRequestDto;
 import com.ssafy.seoulpop.notification.dto.NotificationResponseDto;
+import com.ssafy.seoulpop.notification.dto.UpdateRequestDto;
 import com.ssafy.seoulpop.notification.repository.NotificationRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -126,6 +127,13 @@ public class NotificationService {
         }
 
         return resultList;
+    }
+
+    public String updateNotification(UpdateRequestDto requestDto) {
+        PushNotification findNotification = notificationRepository.findById(requestDto.notificationId()).orElseThrow(() -> new BaseException(ErrorCode.NOTIFICATION_NOT_FOUND_ERROR));
+        findNotification.updateChecked();
+        notificationRepository.save(findNotification);
+        return "알림 확인 여부가 업데이트되었습니다.";
     }
 
     private boolean checkSendable(long memberId) {
