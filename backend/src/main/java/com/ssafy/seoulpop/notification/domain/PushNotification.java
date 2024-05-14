@@ -39,7 +39,7 @@ public class PushNotification extends BaseEntity {
     @ColumnDefault("false")
     private Boolean checked;
 
-    public void updateRead() {
+    public void updateChecked() {
         this.checked = !this.checked;
     }
 }
