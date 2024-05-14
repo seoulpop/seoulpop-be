@@ -22,6 +22,7 @@ public enum ErrorCode {
     INVALID_LOCATION_ERROR(HttpStatus.BAD_REQUEST, "유효하지 않은 위,경도입니다."),
     MEMBER_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "해당 회원을 찾을 수 없습니다."),
     HISTORY_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "해당 역사 정보를 찾을 수 없습니다."),
+    NOTIFICATION_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "해당 푸시 알림을 찾을 수 없습니다."),
 
     //5xx
     Internal_Server_Error(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error");
