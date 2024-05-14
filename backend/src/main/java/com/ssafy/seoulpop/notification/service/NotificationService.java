@@ -26,6 +26,7 @@ import com.ssafy.seoulpop.notification.repository.NotificationRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,6 +52,7 @@ public class NotificationService {
     //check level : 7 ~ 13
     private static final int H3_CHECK_LEVEL = 9;
     private static final double EARTH_RADIUS_M = 6371000.0;
+    private static final long COOKIE_AGE = 30L * 24 * 60 * 60;
 
     private final FcmApiClient fcmApiClient;
     private final ServiceAccountKey serviceAccountKey;
@@ -64,7 +66,7 @@ public class NotificationService {
         ResponseCookie cookie = ResponseCookie.from("fcmToken", requestDto.fcmToken())
             .path("/")
             .sameSite("None")
-            .maxAge(365L * 24 * 60 * 60)
+            .maxAge(COOKIE_AGE)
             .secure(true)
             .httpOnly(true)
             .build();
@@ -75,9 +77,9 @@ public class NotificationService {
     }
 
     public String sendNotification(HttpServletRequest request, NotificationRequestDto notificationRequest) throws IOException {
-//        if (!checkSendable(notificationRequest.memberId())) {
-//            return "알림 전송이 불가능합니다.";
-//        }
+        //if (!checkSendable(notificationRequest.memberId())) {
+        //  return "알림 전송이 불가능합니다.";
+        //}
 
         List<NearByHistoryResponseDto> nearByHistoryList = historyService.readNearByHistoryList(notificationRequest.memberId(),
             notificationRequest.lat(), notificationRequest.lng(), H3_CHECK_LEVEL);
@@ -108,7 +110,7 @@ public class NotificationService {
     }
 
     public List<NotificationResponseDto> readNotificationList(long memberId) {
-        List<PushNotification> findNotificationList = notificationRepository.findAllByMember_Id(memberId);
+        List<PushNotification> findNotificationList = notificationRepository.findAllByMemberId(memberId);
 
         List<NotificationResponseDto> resultList = new ArrayList<>();
         for (PushNotification notification : findNotificationList) {
@@ -130,13 +132,13 @@ public class NotificationService {
         return resultList;
     }
 
+    @Transactional
     public String updateNotification(UpdateRequestDto requestDto) {
         PushNotification findNotification = notificationRepository.findById(requestDto.notificationId()).orElseThrow(() -> new BaseException(ErrorCode.NOTIFICATION_NOT_FOUND_ERROR));
         if (!findNotification.getChecked()) {
             findNotification.updateChecked();
-            notificationRepository.save(findNotification);
         }
-        
+
         return "알림 확인 여부가 업데이트되었습니다.";
     }
 
