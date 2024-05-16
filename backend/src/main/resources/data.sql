@@ -5551,7 +5551,7 @@ VALUES (1, -100);
 --multicampus
 INSERT INTO history (id, lat, lng, name, category, thumbnail, address, label, summary, status, description, additional_info, historic_address, reference, ar_image, registered_at, era, atlas_image_url,
                      cell_7_index, cell_8_index, cell_9_index, cell_10_index, cell_11_index, cell_12_index, created_at, updated_at)
-VALUES (-1, 37.50127672, 127.03960025, '탑골공원(파고다공원)', '3·1운동', 'https://seoulpop.s3.ap-northeast-2.amazonaws.com/31운동/이미지/318_손병희 동상.jpg', '서울 종로구 종로2가 38-1', '기타(공원)',
+VALUES (-1, 37.5012767241426, 127.039600248343, '탑골공원(파고다공원)', '3·1운동', 'https://seoulpop.s3.ap-northeast-2.amazonaws.com/31운동/이미지/318_3.1독립선언 기념비.jpg', '서울 종로구 종로2가 38-1', '기타(공원)',
         '1919년 3월 1일 수천 명의 학생과 시민들이 운집한 가운데 독립선언식을 거행한 곳', '부분변형',
         '1919년 3·1운동 전날 독립선언서에 서명한 민족대표들이 사전 연락도 없이 일방적으로 독립선언식 장소를 태화관으로 변경한 사실을 확인한 학생대표들은 태화관을 항의 방문한 뒤 당초 예정했던 탑골공원에서 3월 1일 오후 2시 30분경에 독자적인 독립선언식을 거행하였다. 학생대표가 공원 팔각정에 올라가 독립선언서를 낭독하고 독립만세를 부르자, 학생들은 태극기를 꺼내 흔들며 대한독립만세를 외치고 공원을 나서 시가행진에 돌입하였다. 이 때 종로를 거쳐 덕수궁 대한문에 이르는 길의 수많은 군중들이 시위 대열에 합류함으로써 만세시위는 대대적인 독립운동으로 발전하였다. 3·1운동의 거족적인 독립만세 시위는 이렇게 탑골공원에서 점화되어 전국으로 퍼져 나갔다.\n10층 석탑이 있어 탑골이라는 이름이 붙은 탑골공원은 본래 원각사라는 절이 있던 곳으로, 대한제국시기에 서울 최초의 근대식 공원으로 조성되었으며, 3·1운동의 발화지로 역사에 큰 자취를 남겼다.',
         NULL, '경성부 종로2정목 38', '독립운동사편찬위원회, 『독립운동사자료집』13, 1977, 103쪽.', 'https://seoulpop.s3.ap-northeast-2.amazonaws.com/31운동/1715065176608_38_탑골공원운동.png', NULL, NULL,
