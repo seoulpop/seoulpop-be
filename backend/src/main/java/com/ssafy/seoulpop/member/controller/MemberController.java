@@ -11,7 +11,6 @@ import com.ssafy.seoulpop.member.service.MemberService;
 import com.ssafy.seoulpop.member.service.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -58,9 +57,6 @@ public class MemberController {
     ) {
         LoginDto login = memberService.createMember(request);
 
-        Cookie cookie = new Cookie("refreshToken", login.refreshToken());
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
         // 기존의 쿠키 설정을 문자열로 변환
         String cookieValue = "refreshToken=" + login.refreshToken()
             + "; HttpOnly; Secure; Path=/; SameSite=None";
