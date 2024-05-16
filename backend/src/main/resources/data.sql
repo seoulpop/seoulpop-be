@@ -5537,7 +5537,7 @@ VALUES (1, 1, 'https://www.heritage.go.kr/unisearch/images/national_treasure/thu
        (3730, 318, 'https://seoulpop.s3.ap-northeast-2.amazonaws.com/31운동/이미지/318_3.1운동 기념부조.jpg', '3.1운동 기념부조'),
        (3731, 318, 'https://seoulpop.s3.ap-northeast-2.amazonaws.com/31운동/이미지/318_탑골공원 전경.jpg', '탑골공원 전경'),
        (3732, 318, 'https://seoulpop.s3.ap-northeast-2.amazonaws.com/31운동/이미지/318_3.1 독립선언서.jpg', '3.1 독립선언서'),
-       (3733, 318, 'https://seoulpop.s3.ap-northeast-2.amazonaws.com/31운동/이미지/318_탑골공원 안의 팔각정.jpg', '탑골공원 안의 팔각정');
+       (3733, 318, 'https://seoulpop.s3.ap-northeast-2.amazonaws.com/31운동/이미지/318_3.1독립선언 기념비.jpg', '탑골공원 안의 팔각정');
 
 
 --member
@@ -5556,4 +5556,14 @@ VALUES (-1, 37.5012767241426, 127.039600248343, '탑골공원(파고다공원)',
         '1919년 3·1운동 전날 독립선언서에 서명한 민족대표들이 사전 연락도 없이 일방적으로 독립선언식 장소를 태화관으로 변경한 사실을 확인한 학생대표들은 태화관을 항의 방문한 뒤 당초 예정했던 탑골공원에서 3월 1일 오후 2시 30분경에 독자적인 독립선언식을 거행하였다. 학생대표가 공원 팔각정에 올라가 독립선언서를 낭독하고 독립만세를 부르자, 학생들은 태극기를 꺼내 흔들며 대한독립만세를 외치고 공원을 나서 시가행진에 돌입하였다. 이 때 종로를 거쳐 덕수궁 대한문에 이르는 길의 수많은 군중들이 시위 대열에 합류함으로써 만세시위는 대대적인 독립운동으로 발전하였다. 3·1운동의 거족적인 독립만세 시위는 이렇게 탑골공원에서 점화되어 전국으로 퍼져 나갔다.\n10층 석탑이 있어 탑골이라는 이름이 붙은 탑골공원은 본래 원각사라는 절이 있던 곳으로, 대한제국시기에 서울 최초의 근대식 공원으로 조성되었으며, 3·1운동의 발화지로 역사에 큰 자취를 남겼다.',
         NULL, '경성부 종로2정목 38', '독립운동사편찬위원회, 『독립운동사자료집』13, 1977, 103쪽.', 'https://seoulpop.s3.ap-northeast-2.amazonaws.com/31운동/1715065176608_38_탑골공원운동.png', NULL, NULL,
         'https://seoulpop.s3.ap-northeast-2.amazonaws.com/%EB%8F%84%EA%B0%90/3.1%EC%9A%B4%EB%8F%99.png', '8730e1ca3ffffff', '8830e1ca3dfffff', '8930e1ca3c3ffff', '8a30e1ca3c2ffff', '8b30e1ca3c28fff',
-        '8c30e1ca3c283ff', '2024-05-06', '2024-05-06')
+        '8c30e1ca3c283ff', '2024-05-06', '2024-05-06');
+
+INSERT INTO image (id, history_id, image_url, caption)
+VALUES (-2, -1, 'https://seoulpop.s3.ap-northeast-2.amazonaws.com/31운동/이미지/318_손병희 동상.jpg', '손병희 동상'),
+       (-3, -1, 'https://seoulpop.s3.ap-northeast-2.amazonaws.com/31운동/이미지/318_3.1독립선언 기념비.jpg', '3.1독립선언 기념비'),
+       (-4, -1, 'https://seoulpop.s3.ap-northeast-2.amazonaws.com/31운동/이미지/318_용운당만해대선사비.jpg', '용운당만해대선사비'),
+       (-5, -1, 'https://seoulpop.s3.ap-northeast-2.amazonaws.com/31운동/이미지/318_1930년대 탑골공원 전경.jpg', '1930년대 탑골공원 전경'),
+       (-6, -1, 'https://seoulpop.s3.ap-northeast-2.amazonaws.com/31운동/이미지/318_3.1운동 기념부조.jpg', '3.1운동 기념부조'),
+       (-7, -1, 'https://seoulpop.s3.ap-northeast-2.amazonaws.com/31운동/이미지/318_탑골공원 전경.jpg', '탑골공원 전경'),
+       (-8, -1, 'https://seoulpop.s3.ap-northeast-2.amazonaws.com/31운동/이미지/318_3.1 독립선언서.jpg', '3.1 독립선언서'),
+       (-9, -1, 'https://seoulpop.s3.ap-northeast-2.amazonaws.com/31운동/이미지/318_탑골공원 안의 팔각정.jpg', '탑골공원 안의 팔각정');
