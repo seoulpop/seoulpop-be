@@ -22,10 +22,12 @@ public class SecurityConfig {
 
     private final TokenService tokenService;
 
+    private final CorsConfig corsConfig;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-            .cors(AbstractHttpConfigurer::disable)
+            .addFilter(corsConfig.corsFilter())
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .formLogin(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth.requestMatchers(
@@ -39,7 +41,9 @@ public class SecurityConfig {
                     "/swagger-ui",
                     "/swagger-ui/**",
                     "/v3/**",
-                    "/v1/**" // 임시
+                    "/v1/histories", // 임시
+                    "/v1/histories/carousels" // 임시
+//                    "/v1/**" // 임시
                 )
                 .permitAll()
                 .anyRequest()
@@ -57,6 +61,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
