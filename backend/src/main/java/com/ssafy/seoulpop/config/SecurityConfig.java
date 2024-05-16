@@ -41,9 +41,7 @@ public class SecurityConfig {
                     "/swagger-ui",
                     "/swagger-ui/**",
                     "/v3/**",
-                    "/v1/histories", // 임시
-                    "/v1/histories/carousels" // 임시
-//                    "/v1/**" // 임시
+                    "/v1/**" // 임시
                 )
                 .permitAll()
                 .anyRequest()
