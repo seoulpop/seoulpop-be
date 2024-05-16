@@ -9,7 +9,6 @@ import com.ssafy.seoulpop.member.service.OauthLoginService;
 import com.ssafy.seoulpop.member.service.OauthLogoutService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -59,12 +58,8 @@ public class OauthController {
         @PathVariable OauthServerType oauthServerType,
         @RequestParam String code
     ) {
-
         LoginDto login = oauthLoginService.login(oauthServerType, code);
 
-        Cookie cookie = new Cookie("refreshToken", login.refreshToken());
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
         // 기존의 쿠키 설정을 문자열로 변환
         String cookieValue = "refreshToken=" + login.refreshToken()
             + "; HttpOnly; Secure; Path=/; SameSite=None";

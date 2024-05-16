@@ -102,6 +102,8 @@ public class HistoryCustomRepositoryImpl implements HistoryCustomRepository {
         StringPath cellIndexPath = Expressions.stringPath(history.cell, cellIndexField);
         return queryFactory.select(Projections.constructor(NearByArResponseDto.class,
                 history.id,
+                history.name,
+                history.category,
                 history.lat,
                 history.lng,
                 history.arImage
