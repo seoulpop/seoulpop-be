@@ -48,7 +48,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
-    //TODO: Member 연동
 
     //check level : 7 ~ 13
     private static final int H3_CHECK_LEVEL = 9;
@@ -77,12 +76,17 @@ public class NotificationService {
         return "쿠키 발급 완료";
     }
 
-    public String sendNotification(HttpServletRequest request, NotificationRequestDto notificationRequest) throws IOException {
+    public String sendNotification(Member member, HttpServletRequest request, NotificationRequestDto notificationRequest) throws IOException {
+        if(member == null) {
+            log.info("로그인 되어있지 않아 알림 전송 없이 종료되었습니다.");
+            return "로그인 되어있지 않아 알림 전송 없이 종료되었습니다.";
+        }
+
         //if (!checkSendable(notificationRequest.memberId())) {
         //  return "알림 전송이 불가능합니다.";
         //}
 
-        List<NearByHistoryResponseDto> nearByHistoryList = historyService.readNearByHistoryList(notificationRequest.memberId(),
+        List<NearByHistoryResponseDto> nearByHistoryList = historyService.readNearByHistoryList(member.getId(),
             notificationRequest.lat(), notificationRequest.lng(), H3_CHECK_LEVEL);
 
         if (nearByHistoryList.isEmpty()) {
@@ -103,14 +107,15 @@ public class NotificationService {
 
         Gson gson = new Gson();
         fcmApiClient.sendNotification("Bearer " + getAccessToken(), gson.toJson(message));
+        System.out.println(gson.toJson(message));
 
-        saveMessageInfo(notificationRequest.memberId(), nearestHistory.historyId(), message);
+        saveMessageInfo(member.getId(), nearestHistory.historyId(), message);
 
         log.info("알림이 전송되었습니다.");
         return "알림이 전송되었습니다.";
     }
 
-    public List<NotificationResponseDto> readNotificationList(long memberId) {
+    public List<NotificationResponseDto> readNotificationList(Long memberId) {
         List<PushNotification> findNotificationList = notificationRepository.findAllByMemberId(memberId);
 
         List<NotificationResponseDto> resultList = new ArrayList<>();
@@ -143,7 +148,7 @@ public class NotificationService {
         return "알림 확인 여부가 업데이트되었습니다.";
     }
 
-    private boolean checkSendable(long memberId) {
+    private boolean checkSendable(Long memberId) {
         LocalTime fromTime = LocalTime.of(21, 0);
         LocalTime toTime = LocalTime.of(9, 0);
 
@@ -190,7 +195,7 @@ public class NotificationService {
             .build());
     }
 
-    private boolean checkLocalSendable(long memberId, long historyId) {
+    private boolean checkLocalSendable(Long memberId, Long historyId) {
         String checkKey = "notification:" + memberId + ":" + historyId;
         String lastNotification = (String) fcmRedisTemplate.opsForValue().get(checkKey);
         if (lastNotification != null) {
@@ -200,7 +205,7 @@ public class NotificationService {
         return true;
     }
 
-    private double calculateDistance(double memberLatitude, double memberLongitude, double historyLat, double historyLng) {
+    private double calculateDistance(Double memberLatitude, Double memberLongitude, Double historyLat, Double historyLng) {
         checkLocation(memberLatitude, memberLongitude);
 
         //위도와 경도 라디안 변환
@@ -221,7 +226,7 @@ public class NotificationService {
         return EARTH_RADIUS_M * centralAngle;
     }
 
-    private void checkLocation(double lat, double lng) {
+    private void checkLocation(Double lat, Double lng) {
         if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
             throw new BaseException(ErrorCode.INVALID_LOCATION_ERROR);
         }
@@ -288,7 +293,7 @@ public class NotificationService {
         return googleCredentials.getAccessToken().getTokenValue();
     }
 
-    private void saveMessageInfo(long memberId, long historyId, FcmRequestDto requestDto) {
+    private void saveMessageInfo(Long memberId, Long historyId, FcmRequestDto requestDto) {
         //사용자별 하루 한 번 전송을 위한 저장
         fcmRedisTemplate.opsForValue().set("notification:" + memberId, String.valueOf(LocalDateTime.now()), Duration.ofHours(24));
 
