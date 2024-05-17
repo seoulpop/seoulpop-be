@@ -41,6 +41,8 @@ public class SecurityConfig {
                     "/swagger-ui",
                     "/swagger-ui/**",
                     "/v3/**",
+                    "/v1/notifications/regist",
+                    "/v1/notifications/send",
                     "/v1/**" // 임시
                 )
                 .permitAll()
