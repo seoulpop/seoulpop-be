@@ -13,8 +13,10 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AtlasService {
@@ -38,6 +40,7 @@ public class AtlasService {
             atlasRepository.save(Atlas.builder()
                 .member(findMember)
                 .history(findHistory)
+                .visitCnt(1)
                 .build());
             return;
         }
