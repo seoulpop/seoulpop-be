@@ -35,7 +35,7 @@ public class AtlasController {
 
     @Operation(
         summary = "도감 등록",
-        description = "AR 인식이 완료된 역사를 도감에 등록합니다(RequestBody: 역사 아이디)"
+        description = "AR 인식이 완료된 역사를 도감에 등록합니다(추가되면 true 반환)"
     )
     @PostMapping
     public ResponseEntity<Boolean> addAtlas(@AuthenticationPrincipal Member member, @RequestBody AtlasRegistRequestDto requestDto) {
