@@ -3,11 +3,13 @@ package com.ssafy.seoulpop.atlas.controller;
 import com.ssafy.seoulpop.atlas.dto.AtlasInfoResponseDto;
 import com.ssafy.seoulpop.atlas.dto.AtlasRegistRequestDto;
 import com.ssafy.seoulpop.atlas.service.AtlasService;
+import com.ssafy.seoulpop.member.domain.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,22 +26,20 @@ public class AtlasController {
 
     @Operation(
         summary = "도감 조회",
-        description = "회원별 도감 정보를 조회(RequestParam: 회원 아이디(임시))"
+        description = "회원별 도감 정보를 조회"
     )
     @GetMapping
-    public ResponseEntity<List<AtlasInfoResponseDto>> getAtlas() {
-        Long memberId = -100L;
-        return ResponseEntity.ok(atlasService.readAtlas(memberId));
+    public ResponseEntity<List<AtlasInfoResponseDto>> getAtlas(@AuthenticationPrincipal Member member) {
+        return ResponseEntity.ok(atlasService.readAtlas(member.getId()));
     }
 
     @Operation(
         summary = "도감 등록",
-        description = "AR 인식이 완료된 역사를 도감에 등록합니다(RequestBody: 회원 아이디(임시), 역사 아이디)"
+        description = "AR 인식이 완료된 역사를 도감에 등록합니다(RequestBody: 역사 아이디)"
     )
     @PostMapping
-    public ResponseEntity<Void> addAtlas(@RequestBody AtlasRegistRequestDto requestDto) {
-        Long memberId = -100L;
-        atlasService.createAtlas(memberId, requestDto.historyId());
+    public ResponseEntity<Void> addAtlas(@AuthenticationPrincipal Member member, @RequestBody AtlasRegistRequestDto requestDto) {
+        atlasService.createAtlas(member.getId(), requestDto.historyId());
         return ResponseEntity.ok().build();
     }
 }
