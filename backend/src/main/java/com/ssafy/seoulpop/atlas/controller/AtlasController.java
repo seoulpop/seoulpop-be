@@ -38,8 +38,7 @@ public class AtlasController {
         description = "AR 인식이 완료된 역사를 도감에 등록합니다(RequestBody: 역사 아이디)"
     )
     @PostMapping
-    public ResponseEntity<Void> addAtlas(@AuthenticationPrincipal Member member, @RequestBody AtlasRegistRequestDto requestDto) {
-        atlasService.createAtlas(member.getId(), requestDto.historyId());
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Boolean> addAtlas(@AuthenticationPrincipal Member member, @RequestBody AtlasRegistRequestDto requestDto) {
+        return ResponseEntity.ok(atlasService.createAtlas(member.getId(), requestDto.historyId()));
     }
 }

@@ -30,7 +30,7 @@ public class AtlasService {
     }
 
     @Transactional
-    public void createAtlas(Long memberId, Long historyId) {
+    public boolean createAtlas(Long memberId, Long historyId) {
         Member findMember = memberRepository.findById(memberId).orElseThrow(() -> new BaseException(ErrorCode.MEMBER_NOT_FOUND_ERROR));
         History findHistory = historyRepository.findById(historyId).orElseThrow(() -> new BaseException(ErrorCode.HISTORY_NOT_FOUND_ERROR));
 
@@ -42,10 +42,11 @@ public class AtlasService {
                 .history(findHistory)
                 .visitCnt(1)
                 .build());
-            return;
+            return true;
         }
 
         Atlas atlas = findAtlas.get();
         atlas.updateVisitCnt();
+        return false;
     }
 }
