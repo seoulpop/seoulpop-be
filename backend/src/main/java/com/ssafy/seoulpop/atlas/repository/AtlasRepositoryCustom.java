@@ -6,4 +6,6 @@ import java.util.List;
 public interface AtlasRepositoryCustom {
 
     List<AtlasInfoResponseDto> findAtlasInfoByMemberId(Long memberId);
+
+    List<AtlasInfoResponseDto> findAllAtlasInfo();
 }
