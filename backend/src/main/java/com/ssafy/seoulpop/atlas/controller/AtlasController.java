@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,7 +38,7 @@ public class AtlasController {
         description = "AR 인식이 완료된 역사를 도감에 등록합니다(추가되면 true 반환)"
     )
     @PostMapping
-    public ResponseEntity<Boolean> addAtlas(@RequestBody AtlasRegistRequestDto requestDto) {
+    public ResponseEntity<Boolean> addAtlas(@AuthenticationPrincipal Member member, @RequestBody AtlasRegistRequestDto requestDto) {
         return ResponseEntity.ok(atlasService.createAtlas(member.getId(), requestDto.historyId()));
     }
 }
