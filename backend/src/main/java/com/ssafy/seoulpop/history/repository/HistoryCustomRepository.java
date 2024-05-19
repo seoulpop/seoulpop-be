@@ -9,13 +9,13 @@ import java.util.Optional;
 
 public interface HistoryCustomRepository {
 
-    List<NearByHistoryResponseDto> findByMemberIdAndCellList(Long memberId, Integer level, List<String> cellList);
+    List<NearByHistoryResponseDto> findByCell(Integer level, List<String> cellList);
 
     List<NearByArResponseDto> findByCellList(Integer level, List<String> cellList);
 
-    List<HistoryMapResponseDto> findAllByMemberId(Long memberId);
+    List<HistoryMapResponseDto> findAllHistories();
 
-    List<HistoryMapResponseDto> findAllByMemberIdAndCategory(Long memberId, String category);
+    List<HistoryMapResponseDto> findAllByCategory(String category);
 
     Optional<History> findByIdWithImages(Long historyId);
 }

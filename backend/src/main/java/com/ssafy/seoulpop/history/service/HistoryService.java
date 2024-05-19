@@ -36,23 +36,20 @@ public class HistoryService {
         h3 = H3Core.newInstance();
     }
 
-    public List<HistoryMapResponseDto> readHistoryList(Long memberId) {
-        checkMemberId(memberId);
-        return historyRepository.findAllByMemberId(memberId);
+    public List<HistoryMapResponseDto> readHistoryList() {
+        return historyRepository.findAllHistories();
     }
 
-    public List<HistoryMapResponseDto> readHistoryList(Long memberId, String category) {
-        checkMemberId(memberId);
+    public List<HistoryMapResponseDto> readHistoryList(String category) {
         //TODO: category Enum처리 후 검증 로직 추가
-        return historyRepository.findAllByMemberIdAndCategory(memberId, category);
+        return historyRepository.findAllByCategory(category);
     }
 
-    public List<NearByHistoryResponseDto> readNearByHistoryList(Long memberId, Double lat, Double lng, Integer level) {
-        checkMemberId(memberId);
+    public List<NearByHistoryResponseDto> readNearByHistoryList(Double lat, Double lng, Integer level) {
         checkLocation(lat, lng);
         checkLevel(level);
         List<String> cellList = getCellList(lat, lng, level);
-        return historyRepository.findByMemberIdAndCellList(memberId, level, cellList);
+        return historyRepository.findByCell(level, cellList);
     }
 
 
