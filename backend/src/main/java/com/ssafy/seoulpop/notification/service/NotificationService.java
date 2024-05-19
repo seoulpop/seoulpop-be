@@ -117,7 +117,7 @@ public class NotificationService {
     }
 
     public List<NotificationResponseDto> readNotificationList(HttpServletRequest request) {
-        List<PushNotification> findNotificationList = notificationRepository.findAllById(Collections.singleton(getFcmToken(request)));
+        List<PushNotification> findNotificationList = notificationRepository.findAllByFcmToken(getFcmToken(request));
 
         List<NotificationResponseDto> resultList = new ArrayList<>();
         for (PushNotification notification : findNotificationList) {
@@ -305,7 +305,7 @@ public class NotificationService {
 
         notificationRepository.save(
             PushNotification.builder()
-                .id(fcmToken)
+                .fcmToken(fcmToken)
                 .history(findHistory)
                 .body(requestDto.message().notification().body())
                 .title(requestDto.message().notification().title())
