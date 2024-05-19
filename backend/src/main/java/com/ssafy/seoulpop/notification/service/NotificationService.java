@@ -86,7 +86,7 @@ public class NotificationService {
         //  return "알림 전송이 불가능합니다.";
         //}
 
-        List<NearByHistoryResponseDto> nearByHistoryList = historyService.readNearByHistoryList(member.getId(),
+        List<NearByHistoryResponseDto> nearByHistoryList = historyService.readNearByHistoryList(
             notificationRequest.lat(), notificationRequest.lng(), H3_CHECK_LEVEL);
 
         if (nearByHistoryList.isEmpty()) {

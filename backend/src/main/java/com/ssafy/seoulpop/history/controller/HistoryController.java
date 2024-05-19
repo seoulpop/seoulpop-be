@@ -31,11 +31,10 @@ public class HistoryController {
     public ResponseEntity<List<HistoryMapResponseDto>> getHistoryList(
         @RequestParam(required = false) String category
     ) {
-        Long memberId = -100L;
         if (category == null) {
-            return ResponseEntity.ok(historyService.readHistoryList(memberId));
+            return ResponseEntity.ok(historyService.readHistoryList());
         }
-        return ResponseEntity.ok(historyService.readHistoryList(memberId, category));
+        return ResponseEntity.ok(historyService.readHistoryList(category));
     }
 
     @Operation(
@@ -48,8 +47,7 @@ public class HistoryController {
         @RequestParam double lng,
         @RequestParam int level
     ) {
-        Long memberId = -100L;
-        return ResponseEntity.ok(historyService.readNearByHistoryList(memberId, lat, lng, level));
+        return ResponseEntity.ok(historyService.readNearByHistoryList(lat, lng, level));
     }
 
     @Operation(
