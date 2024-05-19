@@ -4,7 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record NotificationResponseDto(
-    String notificationId,
+    Long notificationId,
     Long historyId,
     String historyName,
     String historyCategory,
