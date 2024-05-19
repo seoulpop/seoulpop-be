@@ -5,7 +5,6 @@ import static com.ssafy.seoulpop.history.domain.QHistory.history;
 import static com.ssafy.seoulpop.image.domain.QImage.image;
 
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -23,9 +22,9 @@ public class HistoryCustomRepositoryImpl implements HistoryCustomRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<NearByHistoryResponseDto> findByMemberIdAndCellList(Long memberId, Integer level, List<String> cellList) {
+    public List<NearByHistoryResponseDto> findByCell(Integer level, List<String> cellList) {
         String cellIndexField = getCellIndexField(level);
-        return nearByQuery(memberId, cellList, cellIndexField);
+        return nearByQuery(cellList, cellIndexField);
     }
 
     @Override
@@ -35,31 +34,31 @@ public class HistoryCustomRepositoryImpl implements HistoryCustomRepository {
     }
 
     @Override
-    public List<HistoryMapResponseDto> findAllByMemberId(Long memberId) {
+    public List<HistoryMapResponseDto> findAllHistories() {
         return queryFactory.select(Projections.constructor(HistoryMapResponseDto.class,
                 history.id,
                 history.lat,
                 history.lng,
                 history.name,
                 history.category,
-                new CaseBuilder().when(atlas.id.isNull()).then(false).otherwise(true)))
+                Expressions.constant(false)))
             .from(history)
-            .leftJoin(atlas).on(atlas.history.id.eq(history.id).and(atlas.member.id.eq(memberId)))
+            .leftJoin(atlas).on(atlas.history.id.eq(history.id))
             .orderBy(history.category.asc())
             .fetch();
     }
 
     @Override
-    public List<HistoryMapResponseDto> findAllByMemberIdAndCategory(Long memberId, String category) {
+    public List<HistoryMapResponseDto> findAllByCategory(String category) {
         return queryFactory.select(Projections.constructor(HistoryMapResponseDto.class,
                 history.id,
                 history.lat,
                 history.lng,
                 history.name,
                 history.category,
-                new CaseBuilder().when(atlas.id.isNull()).then(false).otherwise(true)))
+                Expressions.constant(false)))
             .from(history)
-            .leftJoin(atlas).on(atlas.history.id.eq(history.id).and(atlas.member.id.eq(memberId)))
+            .leftJoin(atlas).on(atlas.history.id.eq(history.id))
             .where(history.category.eq(category))
             .orderBy(history.category.asc())
             .fetch();
@@ -80,7 +79,7 @@ public class HistoryCustomRepositoryImpl implements HistoryCustomRepository {
         return "cell" + level + "Index";
     }
 
-    private List<NearByHistoryResponseDto> nearByQuery(Long memberId, List<String> cellList, String cellIndexField) {
+    private List<NearByHistoryResponseDto> nearByQuery(List<String> cellList, String cellIndexField) {
         StringPath cellIndexPath = Expressions.stringPath(history.cell, cellIndexField);
         return queryFactory.select(Projections.constructor(NearByHistoryResponseDto.class,
                 history.id,
@@ -90,9 +89,9 @@ public class HistoryCustomRepositoryImpl implements HistoryCustomRepository {
                 history.category,
                 history.thumbnail,
                 history.address,
-                new CaseBuilder().when(atlas.id.isNull()).then(false).otherwise(true)))
+                Expressions.constant(false)))
             .from(history)
-            .leftJoin(atlas).on(atlas.history.id.eq(history.id).and(atlas.member.id.eq(memberId)))
+            .leftJoin(atlas).on(atlas.history.id.eq(history.id))
             .where(cellIndexPath.in(cellList))
             .orderBy(history.category.asc())
             .fetch();

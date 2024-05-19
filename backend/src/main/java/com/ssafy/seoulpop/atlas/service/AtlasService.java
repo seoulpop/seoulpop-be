@@ -29,6 +29,10 @@ public class AtlasService {
         return atlasRepository.findAtlasInfoByMemberId(memberId);
     }
 
+    public List<AtlasInfoResponseDto> readAtlasList() {
+        return atlasRepository.findAllAtlasInfo();
+    }
+
     @Transactional
     public boolean createAtlas(Long memberId, Long historyId) {
         Member findMember = memberRepository.findById(memberId).orElseThrow(() -> new BaseException(ErrorCode.MEMBER_NOT_FOUND_ERROR));
@@ -49,4 +53,5 @@ public class AtlasService {
         atlas.updateVisitCnt();
         return false;
     }
+
 }

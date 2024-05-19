@@ -28,7 +28,7 @@ public class AtlasController {
         summary = "도감 조회",
         description = "회원별 도감 정보를 조회"
     )
-    @GetMapping
+    @GetMapping("/member")
     public ResponseEntity<List<AtlasInfoResponseDto>> getAtlas(@AuthenticationPrincipal Member member) {
         return ResponseEntity.ok(atlasService.readAtlas(member.getId()));
     }
@@ -40,5 +40,14 @@ public class AtlasController {
     @PostMapping
     public ResponseEntity<Boolean> addAtlas(@AuthenticationPrincipal Member member, @RequestBody AtlasRegistRequestDto requestDto) {
         return ResponseEntity.ok(atlasService.createAtlas(member.getId(), requestDto.historyId()));
+    }
+
+    @Operation(
+        summary = "도감 전체 리스트 조회",
+        description = "도감 이미지 전체를 가져온다."
+    )
+    @GetMapping
+    public ResponseEntity<List<AtlasInfoResponseDto>> getAtlasList() {
+        return ResponseEntity.ok(atlasService.readAtlasList());
     }
 }

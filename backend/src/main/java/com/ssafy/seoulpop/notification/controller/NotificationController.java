@@ -54,7 +54,7 @@ public class NotificationController {
     )
     @GetMapping
     public ResponseEntity<List<NotificationResponseDto>> getNotificationList(HttpServletRequest request) {
-        return ResponseEntity.ok(notificationService.readNotificationList(request);
+        return ResponseEntity.ok(notificationService.readNotificationList(request));
     }
 
     @Operation(

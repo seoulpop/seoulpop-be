@@ -79,12 +79,15 @@ public class NotificationService {
     }
 
     public String sendNotification(HttpServletRequest request, NotificationRequestDto notificationRequest) throws IOException {
+
+        log.info("알림 전송 요청");
         String fcmToken = getFcmToken(request);
 
         //if (!checkSendable(fcmToken)) {
         //  return "알림 전송이 불가능합니다.";
         //}
 
+        log.info("인접 역사 리스트 반환");
         List<NearByHistoryResponseDto> nearByHistoryList = historyService.readNearByHistoryList(notificationRequest.lat(), notificationRequest.lng(), H3_CHECK_LEVEL);
 
         if (nearByHistoryList.isEmpty()) {
@@ -92,6 +95,7 @@ public class NotificationService {
             return "전송할 알림이 없습니다.";
         }
 
+        log.info("가장 가까운 역사 반환");
         Optional<NearestHistoryResponseDto> optionalHistory = findNearestHistory(fcmToken, notificationRequest, nearByHistoryList);
         if (optionalHistory.isEmpty()) {
             log.info("전송할 알림이 없어 종료되었습니다.");
@@ -99,11 +103,12 @@ public class NotificationService {
         }
         NearestHistoryResponseDto nearestHistory = optionalHistory.get();
 
+        log.info("메세지 생성");
         FcmRequestDto message = createMessage(nearestHistory, fcmToken);
+
 
         Gson gson = new Gson();
         fcmApiClient.sendNotification("Bearer " + getAccessToken(), gson.toJson(message));
-        System.out.println(gson.toJson(message));
 
         saveMessageInfo(fcmToken, nearestHistory.historyId(), message);
 
