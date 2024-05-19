@@ -29,8 +29,8 @@ public class AtlasController {
         description = "회원별 도감 정보를 조회"
     )
     @GetMapping
-    public ResponseEntity<List<AtlasInfoResponseDto>> getAtlas() {
-        return ResponseEntity.ok(atlasService.readAtlas(member.getId()));
+    public ResponseEntity<boolean[]> getAtlas() {
+        return ResponseEntity.ok(atlasService.readAtlas());
     }
 
     @Operation(

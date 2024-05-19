@@ -25,8 +25,8 @@ public class AtlasService {
     private final MemberRepository memberRepository;
     private final HistoryRepository historyRepository;
 
-    public List<AtlasInfoResponseDto> readAtlas(Long memberId) {
-        return atlasRepository.findAtlasInfoByMemberId(memberId);
+    public boolean[] readAtlas() {
+        return new boolean[(int)historyRepository.count()];
     }
 
     @Transactional
