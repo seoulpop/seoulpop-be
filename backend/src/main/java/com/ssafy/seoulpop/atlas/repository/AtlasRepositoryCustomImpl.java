@@ -5,6 +5,7 @@ import static com.ssafy.seoulpop.history.domain.QHistory.history;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ssafy.seoulpop.atlas.dto.AtlasInfoResponseDto;
 import java.util.List;
@@ -25,6 +26,21 @@ public class AtlasRepositoryCustomImpl implements AtlasRepositoryCustom {
                 new CaseBuilder().when(atlas.id.isNull()).then(false).otherwise(true)))
             .from(history)
             .leftJoin(atlas).on(atlas.history.id.eq(history.id).and(atlas.member.id.eq(memberId)))
+            .orderBy(history.category.asc())
+            .fetch();
+    }
+
+    @Override
+    public List<AtlasInfoResponseDto> findAllAtlasInfo() {
+        return jpaQueryFactory.select(Projections.constructor(AtlasInfoResponseDto.class,
+                history.id,
+                history.category,
+                history.name,
+                history.atlasImageUrl,
+                Expressions.constant(false)))
+            .from(history)
+            .leftJoin(atlas).on(atlas.history.id.eq(history.id))
+            .where(history.id.gt(0))
             .orderBy(history.category.asc())
             .fetch();
     }
