@@ -33,11 +33,8 @@ import java.io.InputStream;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -59,11 +56,16 @@ public class NotificationService {
     private final RedisTemplate<String, Object> fcmRedisTemplate;
     private final HistoryService historyService;
     private final HistoryRepository historyRepository;
-    private final MemberRepository memberRepository;
     private final NotificationRepository notificationRepository;
 
     public String createCookie(HttpServletResponse response, CookieRequestDto requestDto) {
-        ResponseCookie cookie = ResponseCookie.from("fcmToken", requestDto.fcmToken())
+        String fcmToken = requestDto.fcmToken();
+
+        if(fcmToken == "" || fcmToken == null) {
+            throw new BaseException(ErrorCode.FCM_TOKEN_NOT_FOUND_ERROR);
+        }
+
+        ResponseCookie cookie = ResponseCookie.from("fcmToken", fcmToken)
             .path("/")
             .sameSite("None")
             .maxAge(COOKIE_AGE)
@@ -76,32 +78,26 @@ public class NotificationService {
         return "쿠키 발급 완료";
     }
 
-    public String sendNotification(Member member, HttpServletRequest request, NotificationRequestDto notificationRequest) throws IOException {
-        if(member == null) {
-            log.info("로그인 되어있지 않아 알림 전송 없이 종료되었습니다.");
-            return "로그인 되어있지 않아 알림 전송 없이 종료되었습니다.";
-        }
+    public String sendNotification(HttpServletRequest request, NotificationRequestDto notificationRequest) throws IOException {
+        String fcmToken = getFcmToken(request);
 
-        //if (!checkSendable(notificationRequest.memberId())) {
+        //if (!checkSendable(fcmToken)) {
         //  return "알림 전송이 불가능합니다.";
         //}
 
-        List<NearByHistoryResponseDto> nearByHistoryList = historyService.readNearByHistoryList(member.getId(),
-            notificationRequest.lat(), notificationRequest.lng(), H3_CHECK_LEVEL);
+        List<NearByHistoryResponseDto> nearByHistoryList = historyService.readNearByHistoryList(notificationRequest.lat(), notificationRequest.lng(), H3_CHECK_LEVEL);
 
         if (nearByHistoryList.isEmpty()) {
             log.info("전송할 알림이 없어 종료되었습니다.");
             return "전송할 알림이 없습니다.";
         }
 
-        Optional<NearestHistoryResponseDto> optionalHistory = findNearestHistory(notificationRequest, nearByHistoryList);
+        Optional<NearestHistoryResponseDto> optionalHistory = findNearestHistory(fcmToken, notificationRequest, nearByHistoryList);
         if (optionalHistory.isEmpty()) {
             log.info("전송할 알림이 없어 종료되었습니다.");
             return "전송할 알림이 없습니다.";
         }
         NearestHistoryResponseDto nearestHistory = optionalHistory.get();
-
-        String fcmToken = readFcmToken(request);
 
         FcmRequestDto message = createMessage(nearestHistory, fcmToken);
 
@@ -109,14 +105,14 @@ public class NotificationService {
         fcmApiClient.sendNotification("Bearer " + getAccessToken(), gson.toJson(message));
         System.out.println(gson.toJson(message));
 
-        saveMessageInfo(member.getId(), nearestHistory.historyId(), message);
+        saveMessageInfo(fcmToken, nearestHistory.historyId(), message);
 
         log.info("알림이 전송되었습니다.");
         return "알림이 전송되었습니다.";
     }
 
-    public List<NotificationResponseDto> readNotificationList(Long memberId) {
-        List<PushNotification> findNotificationList = notificationRepository.findAllByMemberId(memberId);
+    public List<NotificationResponseDto> readNotificationList(HttpServletRequest request) {
+        List<PushNotification> findNotificationList = notificationRepository.findAllById(Collections.singleton(getFcmToken(request)));
 
         List<NotificationResponseDto> resultList = new ArrayList<>();
         for (PushNotification notification : findNotificationList) {
@@ -148,7 +144,20 @@ public class NotificationService {
         return "알림 확인 여부가 업데이트되었습니다.";
     }
 
-    private boolean checkSendable(Long memberId) {
+    private String getFcmToken(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            throw new BaseException(ErrorCode.FCM_TOKEN_NOT_REGISTERED_ERROR);
+        }
+
+        return Arrays.stream(cookies)
+                .filter(cookie -> "fcmToken".equals(cookie.getName()))
+                .findFirst()
+                .map(Cookie::getValue)
+                .orElseThrow(() -> new BaseException(ErrorCode.FCM_TOKEN_NOT_FOUND_ERROR));
+    }
+
+    private boolean checkSendable(String fcmToken) {
         LocalTime fromTime = LocalTime.of(21, 0);
         LocalTime toTime = LocalTime.of(9, 0);
 
@@ -156,8 +165,7 @@ public class NotificationService {
             return false;
         }
 
-        String checkKey = "notification:" + memberId;
-        String lastNotification = (String) fcmRedisTemplate.opsForValue().get(checkKey);
+        String lastNotification = (String) fcmRedisTemplate.opsForValue().get(fcmToken);
         if (lastNotification != null) {
             return false;
         }
@@ -165,11 +173,11 @@ public class NotificationService {
         return true;
     }
 
-    private Optional<NearestHistoryResponseDto> findNearestHistory(NotificationRequestDto notificationRequest, List<NearByHistoryResponseDto> nearByHistoryList) {
+    private Optional<NearestHistoryResponseDto> findNearestHistory(String fcmToken, NotificationRequestDto notificationRequest, List<NearByHistoryResponseDto> nearByHistoryList) {
         double minDistance = Double.MAX_VALUE;
         NearByHistoryResponseDto nearestHistory = null;
         for (NearByHistoryResponseDto nearByHistory : nearByHistoryList) {
-            //if (!checkLocalSendable(notificationRequest.memberId(), nearByHistory.id())) {
+            //if (!checkLocalSendable(fcmToken, nearByHistory.id())) {
             //    continue;
             //}
 
@@ -195,8 +203,8 @@ public class NotificationService {
             .build());
     }
 
-    private boolean checkLocalSendable(Long memberId, Long historyId) {
-        String checkKey = "notification:" + memberId + ":" + historyId;
+    private boolean checkLocalSendable(String fcmToken, Long historyId) {
+        String checkKey = fcmToken + ":" + historyId;
         String lastNotification = (String) fcmRedisTemplate.opsForValue().get(checkKey);
         if (lastNotification != null) {
             return false;
@@ -230,19 +238,6 @@ public class NotificationService {
         if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
             throw new BaseException(ErrorCode.INVALID_LOCATION_ERROR);
         }
-    }
-
-    private String readFcmToken(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null) {
-            throw new BaseException(ErrorCode.FCM_TOKEN_NOT_REGISTERED_ERROR);
-        }
-
-        return Arrays.stream(cookies)
-            .filter(cookie -> "fcmToken".equals(cookie.getName()))
-            .findFirst()
-            .map(Cookie::getValue)
-            .orElseThrow(() -> new BaseException(ErrorCode.FCM_TOKEN_NOT_FOUND_ERROR));
     }
 
     private FcmRequestDto createMessage(NearestHistoryResponseDto nearestHistory, String fcmToken) {
@@ -293,21 +288,19 @@ public class NotificationService {
         return googleCredentials.getAccessToken().getTokenValue();
     }
 
-    private void saveMessageInfo(Long memberId, Long historyId, FcmRequestDto requestDto) {
+    private void saveMessageInfo(String fcmToken, Long historyId, FcmRequestDto requestDto) {
         //사용자별 하루 한 번 전송을 위한 저장
-        fcmRedisTemplate.opsForValue().set("notification:" + memberId, String.valueOf(LocalDateTime.now()), Duration.ofHours(24));
+        fcmRedisTemplate.opsForValue().set(fcmToken, String.valueOf(LocalDateTime.now()), Duration.ofHours(24));
 
         //장소별 하루 한 번 전송을 위한 저장
-        fcmRedisTemplate.opsForValue().set("notification:" + memberId + ":" + historyId, String.valueOf(LocalDateTime.now()), Duration.ofHours(24));
+        fcmRedisTemplate.opsForValue().set(fcmToken + ":" + historyId, String.valueOf(LocalDateTime.now()), Duration.ofHours(24));
 
         //알림 내용 저장
-        Member findMember = memberRepository.findById(memberId).orElseThrow(() -> new BaseException(ErrorCode.MEMBER_NOT_FOUND_ERROR));
         History findHistory = historyRepository.findById(historyId).orElseThrow(() -> new BaseException(ErrorCode.HISTORY_NOT_FOUND_ERROR));
 
         notificationRepository.save(
             PushNotification.builder()
-                .id(requestDto.message().data().notificationId())
-                .member(findMember)
+                .id(fcmToken)
                 .history(findHistory)
                 .body(requestDto.message().notification().body())
                 .title(requestDto.message().notification().title())

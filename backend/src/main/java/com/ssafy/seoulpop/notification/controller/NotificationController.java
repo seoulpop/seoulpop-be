@@ -44,8 +44,8 @@ public class NotificationController {
         description = "사용자 위치 기반 알림 확인, 가장 가까운 역사 알림 생성"
     )
     @PostMapping("/send")
-    public ResponseEntity<String> addNotification(@AuthenticationPrincipal Member member, HttpServletRequest request, @RequestBody NotificationRequestDto requestDto) throws IOException {
-        return ResponseEntity.ok(notificationService.sendNotification(member, request, requestDto));
+    public ResponseEntity<String> addNotification(HttpServletRequest request, @RequestBody NotificationRequestDto requestDto) throws IOException {
+        return ResponseEntity.ok(notificationService.sendNotification(request, requestDto));
     }
 
     @Operation(
@@ -53,8 +53,8 @@ public class NotificationController {
         description = "사용자별 알림 내역 조회, List로 반환"
     )
     @GetMapping
-    public ResponseEntity<List<NotificationResponseDto>> getNotificationList(@AuthenticationPrincipal Member member, HttpServletRequest request) {
-        return ResponseEntity.ok(notificationService.readNotificationList(member.getId()));
+    public ResponseEntity<List<NotificationResponseDto>> getNotificationList(HttpServletRequest request) {
+        return ResponseEntity.ok(notificationService.readNotificationList(request);
     }
 
     @Operation(

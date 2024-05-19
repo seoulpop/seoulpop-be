@@ -6,5 +6,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface NotificationRepository extends JpaRepository<PushNotification, String> {
 
-    List<PushNotification> findAllByMemberId(Long memberId);
 }
