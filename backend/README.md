@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://seoul-pop.com">
-    <img src="assets/main.png" width="300" alt="main">
+    <img src="assets/logo.png" width="300" alt="main">
   </a>
 </p>
 
@@ -50,16 +50,15 @@
 - 데이터 전처리
 - 역사 조회 기능 (문화재 + 사적지)
 - H3 기반 거리 산정 기능
-- 발표
 
 ### 이경배
 
-- 데이터 선정
 - 데이터 크롤링
 - 데이터 전처리
 - Firebase 알림 기능
 - 역사 조회 기능 (문화재 + 사적지)
 - 도감 기능
+- 발표
 
 ---
 
@@ -77,7 +76,7 @@
 
 ## 📝 Specification
 
-- notion : [노션 주소]
+- notion : https://takealook97.notion.site/seoul-pop-80cd53b40a034941b47d5b3676ab0eb2
 
 <br>
 
@@ -133,7 +132,7 @@
 
 - AWS EC2
 - Jenkins
-- Docker, Docker Hub, Portainer
+- Docker, Docker Hub, Portainer, Dozzle
 - Nginx Proxy Manager
 
 <br>
@@ -154,13 +153,13 @@
 
 ## 🏠 Service Layout
 
-| <img src="./assets/service/map.png" width="250" alt="map"> | <img src="./assets/service/ar.png" width="250" alt="ar"> |
-|:----------------------------------------------------------:|:--------------------------------------------------------:|
-|                        History Map                         |                            AR                            |
+| <img src="./assets/map.jpg" width="250" alt="map"> | <img src="./assets/alert.jpg" width="250" alt="alert"> |
+|:--------------------------------------------------:|:------------------------------------------------------:|
+|                    History Map                     |                         Alert                          |
 
-| <img src="./assets/service/details.png" width="250" alt="details"> | <img src="./assets/service/atlas.png" width="250" alt="atlas"> |
-|:------------------------------------------------------------------:|:--------------------------------------------------------------:|
-|                          History Details                           |                             Atlas                              |
+| <img src="./assets/ar.jpg" width="250" alt="ar"> | <img src="./assets/detail.jpg" width="250" alt="detail"> |
+|:------------------------------------------------:|:--------------------------------------------------------:|
+|                        AR                        |                          Detail                          |
 
 <br>
 
