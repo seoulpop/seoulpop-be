@@ -10,8 +10,6 @@ import com.ssafy.seoulpop.history.domain.History;
 import com.ssafy.seoulpop.history.dto.NearByHistoryResponseDto;
 import com.ssafy.seoulpop.history.repository.HistoryRepository;
 import com.ssafy.seoulpop.history.service.HistoryService;
-import com.ssafy.seoulpop.member.domain.Member;
-import com.ssafy.seoulpop.member.repository.MemberRepository;
 import com.ssafy.seoulpop.notification.domain.PushNotification;
 import com.ssafy.seoulpop.notification.domain.account.ServiceAccountKey;
 import com.ssafy.seoulpop.notification.domain.client.FcmApiClient;
@@ -33,8 +31,11 @@ import java.io.InputStream;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -61,7 +62,7 @@ public class NotificationService {
     public String createCookie(HttpServletResponse response, CookieRequestDto requestDto) {
         String fcmToken = requestDto.fcmToken();
 
-        if(fcmToken == "" || fcmToken == null) {
+        if (fcmToken == "" || fcmToken == null) {
             throw new BaseException(ErrorCode.FCM_TOKEN_NOT_FOUND_ERROR);
         }
 
@@ -79,13 +80,12 @@ public class NotificationService {
     }
 
     public String sendNotification(HttpServletRequest request, NotificationRequestDto notificationRequest) throws IOException {
-
         log.info("알림 전송 요청");
         String fcmToken = getFcmToken(request);
 
-        //if (!checkSendable(fcmToken)) {
-        //  return "알림 전송이 불가능합니다.";
-        //}
+        if (!checkSendable(fcmToken)) {
+            return "알림 전송이 불가능합니다.";
+        }
 
         log.info("인접 역사 리스트 반환");
         List<NearByHistoryResponseDto> nearByHistoryList = historyService.readNearByHistoryList(notificationRequest.lat(), notificationRequest.lng(), H3_CHECK_LEVEL);
@@ -105,7 +105,6 @@ public class NotificationService {
 
         log.info("메세지 생성");
         FcmRequestDto message = createMessage(nearestHistory, fcmToken);
-
 
         Gson gson = new Gson();
         fcmApiClient.sendNotification("Bearer " + getAccessToken(), gson.toJson(message));
@@ -156,15 +155,15 @@ public class NotificationService {
         }
 
         return Arrays.stream(cookies)
-                .filter(cookie -> "fcmToken".equals(cookie.getName()))
-                .findFirst()
-                .map(Cookie::getValue)
-                .orElseThrow(() -> new BaseException(ErrorCode.FCM_TOKEN_NOT_FOUND_ERROR));
+            .filter(cookie -> "fcmToken".equals(cookie.getName()))
+            .findFirst()
+            .map(Cookie::getValue)
+            .orElseThrow(() -> new BaseException(ErrorCode.FCM_TOKEN_NOT_FOUND_ERROR));
     }
 
     private boolean checkSendable(String fcmToken) {
         LocalTime fromTime = LocalTime.of(21, 0);
-        LocalTime toTime = LocalTime.of(9, 0);
+        LocalTime toTime = LocalTime.of(8, 0);
 
         if (LocalTime.now().isAfter(fromTime) || LocalTime.now().isBefore(toTime)) {
             return false;
@@ -182,9 +181,9 @@ public class NotificationService {
         double minDistance = Double.MAX_VALUE;
         NearByHistoryResponseDto nearestHistory = null;
         for (NearByHistoryResponseDto nearByHistory : nearByHistoryList) {
-            //if (!checkLocalSendable(fcmToken, nearByHistory.id())) {
-            //    continue;
-            //}
+            if (!checkLocalSendable(fcmToken, nearByHistory.id())) {
+                continue;
+            }
 
             double distance = calculateDistance(notificationRequest.lat(), notificationRequest.lng(), nearByHistory.lat(), nearByHistory.lng());
 
