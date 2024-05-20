@@ -5,6 +5,11 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+### CheckStyle Jar###
+config/checkstyle/*.jar
+### Query Dsl###
+src/main/generated
+
 ### STS ###
 .apt_generated
 .classpath
@@ -25,7 +30,7 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
-application-secret.yml
+../../../Desktop/application-secret.yml
 
 ### NetBeans ###
 /nbproject/private/
@@ -36,6 +41,3 @@ application-secret.yml
 
 ### VS Code ###
 .vscode/
-
-### node modules
-/node_modules
